@@ -3,45 +3,52 @@ package com.sofascore.tonib.firsttask.service.model.entities;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
-import com.sofascore.tonib.firsttask.service.model.entities.Sport;
+import com.google.gson.annotations.SerializedName;
 
-@Entity
+
+@Entity(tableName = "team")
 public class Team {
 
+    @NonNull
     @PrimaryKey
-    private int uid;
-
-    @ColumnInfo(name = "name")
-    private String name;
-
-    @ColumnInfo(name = "slug")
-    private String slug;
-
-    @ColumnInfo(name = "gender")
-    private String gender;
-
-    @ColumnInfo(name = "sport")
-    private Sport sport;
-
-    @ColumnInfo(name = "userCount")
-    private int userCount;
-
-    @ColumnInfo(name = "national")
-    private Boolean national;
-
+    @SerializedName("id")
     @ColumnInfo(name = "id")
     private int id;
 
-    public Team(int uid, String name, String slug, String gender, Sport sport, int userCount, Boolean national, int id) {
-        this.uid = uid;
+    @SerializedName("name")
+    @ColumnInfo(name = "name")
+    private String name;
+
+    @SerializedName("slug")
+    @ColumnInfo(name = "slug")
+    private String slug;
+
+    @SerializedName("gender")
+    @ColumnInfo(name = "gender")
+    private String gender;
+
+    /*@SerializedName("sport")
+    @ColumnInfo(name = "sport")
+    private Sport sport;*/
+
+    @SerializedName("userCount")
+    @ColumnInfo(name = "userCount")
+    private int userCount;
+
+    @SerializedName("national")
+    @ColumnInfo(name = "national")
+    private Boolean national;
+
+    public Team(int id, String name, String slug, String gender, int userCount, Boolean national) {
+        this.id = id;
         this.name = name;
         this.slug = slug;
         this.gender = gender;
-        this.sport = sport;
+        //this.sport = sport;
         this.userCount = userCount;
         this.national = national;
-        this.id = id;
     }
 
     public String getName() {
@@ -56,9 +63,9 @@ public class Team {
         return gender;
     }
 
-    public Sport getSport() {
+    /*public Sport getSport() {
         return sport;
-    }
+    }*/
 
     public int getUserCount() {
         return userCount;
@@ -73,6 +80,7 @@ public class Team {
     }
 
     public String getDetails(){
-        return name + " " + sport.getName();
+        return name + " ";
+        // + sport.getName();
     }
 }

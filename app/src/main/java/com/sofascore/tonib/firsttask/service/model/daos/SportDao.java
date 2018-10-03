@@ -16,7 +16,7 @@ public interface SportDao {
     List<Sport> getAllSports();
 
     @Insert
-    void insertAllSports(List<Sport> sports);
+    void insertSport(Sport sport);
 
     @Delete
     void deleteSport(Sport sport);

@@ -56,6 +56,17 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.ViewHolder>{
         } else{
             cb.setChecked(false);
         }
+        cb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CheckBox cb = (CheckBox) v;
+                if (cb.isChecked()){
+
+                } else {
+
+                }
+            }
+        });
     }
 
     @Override

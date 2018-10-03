@@ -10,8 +10,6 @@ import retrofit2.http.Path;
 
 public interface TeamsService {
 
-    public final String TEAMS_API_URL = "http://mobile.sofascore.com/mobile/v4/mcc/234/teams";
-
     @GET()
     Call<List<Team>> getAllTeams();
 

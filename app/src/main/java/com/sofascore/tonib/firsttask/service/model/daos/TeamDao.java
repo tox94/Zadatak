@@ -14,10 +14,14 @@ import java.util.List;
 public interface TeamDao {
 
     @Query("SELECT * FROM team")
-    List<Sport> getAllTeams();
+    List<Team> getAllTeams();
+
+    @Query("SELECT * FROM team WHERE id LIKE :id")
+    Team getTeamById(int id);
+
 
     @Insert
-    void insertAllTeams(List<Team> teams);
+    void insertTeam(Team team);
 
     @Delete
     void deleteTeam(Team team);
