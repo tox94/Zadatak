@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">FirstTask</string>
+
+    <string name="team_fragment_title">Team</string>
+    <string name="empty_fragment_title">Empty</string>
+
 </resources>
