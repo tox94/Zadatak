@@ -3,5 +3,7 @@
 
     <string name="team_fragment_title">Team</string>
     <string name="empty_fragment_title">Empty</string>
+    <string name="empty_fragment_text">This is an empty fragment</string>
+    <string name="no_entries_picture">Picture</string>
 
 </resources>

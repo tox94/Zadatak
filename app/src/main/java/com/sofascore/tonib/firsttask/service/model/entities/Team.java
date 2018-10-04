@@ -1,6 +1,7 @@
 package com.sofascore.tonib.firsttask.service.model.entities;
 
 import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
@@ -14,58 +15,59 @@ public class Team {
     @NonNull
     @PrimaryKey
     @SerializedName("id")
-    @ColumnInfo(name = "id")
-    private int id;
+    @ColumnInfo(name = "teamId")
+    private int teamId;
 
     @SerializedName("name")
-    @ColumnInfo(name = "name")
-    private String name;
+    @ColumnInfo(name = "teamName")
+    private String teamName;
 
     @SerializedName("slug")
-    @ColumnInfo(name = "slug")
-    private String slug;
+    @ColumnInfo(name = "teamSlug")
+    private String teamSlug;
 
-    @SerializedName("gender")
     @ColumnInfo(name = "gender")
     private String gender;
 
-    /*@SerializedName("sport")
-    @ColumnInfo(name = "sport")
-    private Sport sport;*/
+    @Embedded
+    private Sport sport;
 
-    @SerializedName("userCount")
     @ColumnInfo(name = "userCount")
     private int userCount;
 
-    @SerializedName("national")
     @ColumnInfo(name = "national")
     private Boolean national;
 
-    public Team(int id, String name, String slug, String gender, int userCount, Boolean national) {
-        this.id = id;
-        this.name = name;
-        this.slug = slug;
+    public Team(@NonNull int teamId, String teamName, String teamSlug, String gender, Sport sport, int userCount, Boolean national) {
+        this.teamId = teamId;
+        this.teamName = teamName;
+        this.teamSlug = teamSlug;
         this.gender = gender;
-        //this.sport = sport;
+        this.sport = sport;
         this.userCount = userCount;
         this.national = national;
     }
 
-    public String getName() {
-        return name;
+    @NonNull
+    public int getTeamId() {
+        return teamId;
     }
 
-    public String getSlug() {
-        return slug;
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public String getTeamSlug() {
+        return teamSlug;
     }
 
     public String getGender() {
         return gender;
     }
 
-    /*public Sport getSport() {
+    public Sport getSport() {
         return sport;
-    }*/
+    }
 
     public int getUserCount() {
         return userCount;
@@ -75,12 +77,7 @@ public class Team {
         return national;
     }
 
-    public int getId() {
-        return id;
-    }
-
     public String getDetails(){
-        return name + " ";
-        // + sport.getName();
+        return teamName + ", ";
     }
 }

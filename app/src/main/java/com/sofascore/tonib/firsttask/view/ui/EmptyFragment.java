@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sofascore.tonib.firsttask.R;
+import com.sofascore.tonib.firsttask.viewmodel.EmptyViewModel;
 
 public class EmptyFragment extends Fragment {
 

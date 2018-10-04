@@ -1,7 +1,7 @@
-package com.sofascore.tonib.firsttask.view.ui;
+package com.sofascore.tonib.firsttask.viewmodel;
 
 import android.arch.lifecycle.ViewModel;
 
 public class EmptyViewModel extends ViewModel {
-    // TODO: Implement the ViewModel
+
 }

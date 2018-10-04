@@ -1,11 +1,11 @@
 package com.sofascore.tonib.firsttask.service.model.daos;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
-import com.sofascore.tonib.firsttask.service.model.entities.Sport;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 
 import java.util.List;
@@ -14,17 +14,17 @@ import java.util.List;
 public interface TeamDao {
 
     @Query("SELECT * FROM team")
-    List<Team> getAllTeams();
+    LiveData<List<Team>> getAllTeams();
 
     @Query("SELECT * FROM team WHERE id LIKE :id")
     Team getTeamById(int id);
 
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertTeam(Team team);
 
-    @Delete
-    void deleteTeam(Team team);
+    @Query("DELETE FROM team WHERE teamId = :teamId")
+    void deleteTeam(int teamId);
 
 
 }

@@ -1,6 +1,5 @@
 package com.sofascore.tonib.firsttask.service.repo;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
@@ -15,13 +14,19 @@ public class ProjectRepository {
 
     private TeamsService teamsService;
 
-    public LiveData<List<Team>> getAllTeams(){
+    public ProjectRepository(){
+        teamsService = RetrofitClientInstance.getRetrofitInstance().create(TeamsService.class);
+    }
+
+
+    public MutableLiveData<List<Team>> getAllTeams(){
+
         final MutableLiveData<List<Team>> data = new MutableLiveData<>();
 
         teamsService.getAllTeams().enqueue(new Callback<List<Team>>() {
             @Override
             public void onResponse(Call<List<Team>> call, Response<List<Team>> response) {
-                data.setValue(response.body());
+                data.postValue(response.body());
             }
 
             @Override

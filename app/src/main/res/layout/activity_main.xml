@@ -8,16 +8,22 @@
     tools:context=".view.ui.MainActivity">
 
     <android.support.v4.view.ViewPager
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
         <android.support.v4.view.PagerTabStrip
             android:id="@+id/pager_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="0dp"
+            android:layout_marginTop="4dp"
+            android:background="@color/colorPrimaryDark"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
             android:paddingTop="4dp"
-            android:paddingBottom="4dp"/>
+            android:paddingBottom="4dp"
+            />
     </android.support.v4.view.ViewPager>
 
 </LinearLayout>
