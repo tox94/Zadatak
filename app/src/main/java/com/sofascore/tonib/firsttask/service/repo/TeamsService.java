@@ -1,7 +1,5 @@
 package com.sofascore.tonib.firsttask.service.repo;
 
-import android.arch.lifecycle.MutableLiveData;
-
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 
 import java.util.List;
@@ -15,7 +13,7 @@ public interface TeamsService {
     @GET("teams/")
     Call<List<Team>> getAllTeams();
 
-    @GET("/{id}")
+    @GET("teams/{id}")
     Call<List<Team>> getTeam(@Path("id") int id);
 
 }

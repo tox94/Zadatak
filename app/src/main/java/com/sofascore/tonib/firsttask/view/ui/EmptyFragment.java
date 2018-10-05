@@ -30,7 +30,6 @@ public class EmptyFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mViewModel = ViewModelProviders.of(this).get(EmptyViewModel.class);
-        // TODO: Use the ViewModel
     }
 
 }

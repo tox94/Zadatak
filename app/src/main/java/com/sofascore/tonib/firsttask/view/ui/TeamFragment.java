@@ -77,11 +77,9 @@ public class TeamFragment extends Fragment {
     private void checkForInternetConnectionAndPermissions(){
         if (InternetUtils.isInternetAvailable(getActivity())){
             if (ContextCompat.checkSelfPermission(getActivity(),
-                    Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(getActivity(),
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED){
                 ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        new String[]{Manifest.permission.INTERNET},
                         MY_PERMISSION);
             } else {
                 getDataFromApi();
