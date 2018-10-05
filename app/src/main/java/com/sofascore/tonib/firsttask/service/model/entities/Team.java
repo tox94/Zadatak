@@ -77,21 +77,21 @@ public class Team {
         return national;
     }
 
-    public String getDetails(){
+    public String getDetails() {
         return teamName + ", ";
     }
 
     @Override
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof Team)){
+        if (!(o instanceof Team)) {
             return false;
         }
         Team t = (Team) o;
 
-        if (t.getTeamId() == this.teamId){
+        if (t.getTeamId() == this.teamId) {
             return true;
         }
 

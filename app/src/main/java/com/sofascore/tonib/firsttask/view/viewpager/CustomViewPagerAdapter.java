@@ -14,19 +14,19 @@ public class CustomViewPagerAdapter extends FragmentPagerAdapter {
     private static int TAB_COUNT = 2;
     private Context context;
 
-    public CustomViewPagerAdapter(FragmentManager fm, Context context){
+    public CustomViewPagerAdapter(FragmentManager fm, Context context) {
         super(fm);
         this.context = context;
     }
 
     @Override
-    public int getCount(){
+    public int getCount() {
         return TAB_COUNT;
     }
 
     @Override
-    public Fragment getItem(int position){
-        switch (position){
+    public Fragment getItem(int position) {
+        switch (position) {
             case 0:
                 return new TeamFragment();
             case 1:
@@ -38,8 +38,8 @@ public class CustomViewPagerAdapter extends FragmentPagerAdapter {
     }
 
     @Override
-    public CharSequence getPageTitle(int position){
-        switch (position){
+    public CharSequence getPageTitle(int position) {
+        switch (position) {
             case 0:
                 return context.getString(R.string.team_fragment_title);
             case 1:

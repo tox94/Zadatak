@@ -8,7 +8,7 @@ import static android.content.Context.CONNECTIVITY_SERVICE;
 
 public class InternetUtils {
 
-    private InternetUtils(){
+    private InternetUtils() {
     }
 
     public static boolean isInternetAvailable(Context context) {

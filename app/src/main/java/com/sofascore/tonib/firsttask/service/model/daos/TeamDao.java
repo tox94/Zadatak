@@ -8,7 +8,6 @@ import android.arch.persistence.room.Query;
 
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 
-import java.util.HashMap;
 import java.util.List;
 
 @Dao

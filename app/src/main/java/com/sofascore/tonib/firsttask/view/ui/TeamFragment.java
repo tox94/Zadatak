@@ -72,10 +72,10 @@ public class TeamFragment extends Fragment {
         handler.post(runnable);
     }
 
-    private void checkForInternetConnectionAndPermissions(){
-        if (InternetUtils.isInternetAvailable(getActivity())){
+    private void checkForInternetConnectionAndPermissions() {
+        if (InternetUtils.isInternetAvailable(getActivity())) {
             if (ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED){
+                    Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(getActivity(),
                         new String[]{Manifest.permission.INTERNET},
                         MY_PERMISSION);
@@ -87,7 +87,7 @@ public class TeamFragment extends Fragment {
         }
     }
 
-    private void initViews(){
+    private void initViews() {
         recyclerView = getActivity().findViewById(R.id.teamRecyclerView);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
@@ -106,7 +106,7 @@ public class TeamFragment extends Fragment {
         });
     }
 
-    private void getDataFromApi(){
+    private void getDataFromApi() {
         Log.d("SYNCANJE", "Sve");
         final MutableLiveData<List<Team>> apiTeams = teamListViewModel.getAllTeams();
         final LiveData<List<Team>> dbTeams = teamListViewModel.getTeamsFromDb();
@@ -124,8 +124,8 @@ public class TeamFragment extends Fragment {
             @Override
             public void onChanged(@Nullable List<Team> teams) {
                 HashMap<Integer, Team> map = new HashMap<>();
-                if (teams != null){
-                    for(Team t : teams) {
+                if (teams != null) {
+                    for (Team t : teams) {
                         map.put(t.getTeamId(), t);
                     }
                 }
@@ -137,10 +137,10 @@ public class TeamFragment extends Fragment {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
-        switch(requestCode){
-            case MY_PERMISSION:{
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     getDataFromApi();
                 } else {
                     Toast.makeText(getActivity(), "Please enable all permissions.", Toast.LENGTH_SHORT).show();
@@ -151,13 +151,13 @@ public class TeamFragment extends Fragment {
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
         handler.removeCallbacksAndMessages(null);
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         handler.post(runnable);
     }

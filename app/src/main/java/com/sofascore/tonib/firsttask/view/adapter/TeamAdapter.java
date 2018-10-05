@@ -14,7 +14,7 @@ import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 import java.util.HashMap;
 import java.util.List;
 
-public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder>{
+public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder> {
     private List<Team> apiTeams;
     private HashMap<Integer, Team> dbTeams;
     private TeamListViewModel teamListViewModel;
@@ -24,21 +24,21 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
         this.teamListViewModel = teamListViewModel;
     }
 
-    public void updateApiList(List<Team> apiTeams){
+    public void updateApiList(List<Team> apiTeams) {
         this.apiTeams = apiTeams;
         notifyDataSetChanged();
     }
 
-    public void updateDbList(HashMap<Integer, Team> dbTeams){
+    public void updateDbList(HashMap<Integer, Team> dbTeams) {
         this.dbTeams = dbTeams;
         notifyDataSetChanged();
     }
 
-    public static class TeamViewHolder extends RecyclerView.ViewHolder{
+    public static class TeamViewHolder extends RecyclerView.ViewHolder {
         private TextView detailsTextView;
         private CheckBox checkBox;
 
-        public TeamViewHolder(View v){
+        public TeamViewHolder(View v) {
             super(v);
             detailsTextView = v.findViewById(R.id.teamDetailsTextView);
             checkBox = v.findViewById(R.id.saveCheckBox);
@@ -46,7 +46,7 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
     }
 
     @Override
-    public TeamViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
+    public TeamViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new TeamViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.team_list_item, parent, false));
     }
 
@@ -57,12 +57,12 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
         CheckBox cb = viewHolder.checkBox;
         tv.setText(team.getTeamName());
         Boolean contains = false;
-        if (dbTeams != null){
+        if (dbTeams != null) {
             contains = dbTeams.containsKey(team.getTeamId());
         }
-        if (contains){
+        if (contains) {
             cb.setChecked(true);
-        } else{
+        } else {
             cb.setChecked(false);
         }
         cb.setOnClickListener(new View.OnClickListener() {
@@ -79,10 +79,9 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
 
     @Override
     public int getItemCount() {
-        if (apiTeams != null){
+        if (apiTeams != null) {
             return apiTeams.size();
-        }
-        else {
+        } else {
             return 0;
         }
     }

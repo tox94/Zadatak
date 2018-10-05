@@ -14,12 +14,12 @@ public class ProjectRepository {
 
     private TeamsService teamsService;
 
-    public ProjectRepository(){
+    public ProjectRepository() {
         teamsService = RetrofitClientInstance.getRetrofitInstance().create(TeamsService.class);
     }
 
 
-    public MutableLiveData<List<Team>> getAllTeams(){
+    public MutableLiveData<List<Team>> getAllTeams() {
 
         final MutableLiveData<List<Team>> data = new MutableLiveData<>();
 

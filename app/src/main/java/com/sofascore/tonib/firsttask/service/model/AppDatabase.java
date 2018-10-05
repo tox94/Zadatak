@@ -11,20 +11,21 @@ import com.sofascore.tonib.firsttask.service.model.entities.Sport;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 
 @Database(entities = {Sport.class, Team.class},
-            version = 1,
-            exportSchema = false)
+        version = 1,
+        exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase INSTANCE;
 
     public abstract SportDao sportDao();
+
     public abstract TeamDao teamDao();
 
     private static final Object sLock = new Object();
 
-    public static AppDatabase getInstance(Context context){
-        synchronized (sLock){
-            if (INSTANCE == null){
+    public static AppDatabase getInstance(Context context) {
+        synchronized (sLock) {
+            if (INSTANCE == null) {
                 INSTANCE = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, "teams.db")
                         .allowMainThreadQueries()
                         .build();

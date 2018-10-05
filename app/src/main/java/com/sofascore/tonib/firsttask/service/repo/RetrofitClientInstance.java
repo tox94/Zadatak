@@ -10,8 +10,8 @@ public class RetrofitClientInstance {
     private static Retrofit retrofit;
     public static final String TEAMS_API_URL = "https://mobile.sofascore.com/mobile/v4/mcc/234/";
 
-    public static Retrofit getRetrofitInstance(){
-        if (retrofit == null){
+    public static Retrofit getRetrofitInstance() {
+        if (retrofit == null) {
             /*retrofit = new retrofit2.Retrofit.Builder()
                     .baseUrl(TEAMS_API_URL)
                     .addConverterFactory(GsonConverterFactory.create())
@@ -27,7 +27,6 @@ public class RetrofitClientInstance {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
-
 
 
         return retrofit;

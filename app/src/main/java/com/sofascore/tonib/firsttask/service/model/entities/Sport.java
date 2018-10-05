@@ -33,16 +33,16 @@ public class Sport {
     }
 
     @Override
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof Sport)){
+        if (!(o instanceof Sport)) {
             return false;
         }
         Sport t = (Sport) o;
 
-        if (t.getId() == this.id){
+        if (t.getId() == this.id) {
             return true;
         }
 
