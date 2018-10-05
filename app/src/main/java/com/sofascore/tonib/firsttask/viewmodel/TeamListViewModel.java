@@ -14,6 +14,7 @@ import com.sofascore.tonib.firsttask.service.model.daos.TeamDao;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.service.repo.ProjectRepository;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class TeamListViewModel extends AndroidViewModel{
@@ -31,7 +32,6 @@ public class TeamListViewModel extends AndroidViewModel{
 
     public MutableLiveData<List<Team>> getAllTeams(){
         MutableLiveData<List<Team>> allTeams = repo.getAllTeams();
-        //Log.d("DEBUG", String.valueOf(allTeams.getValue().size()));
         return allTeams;
     }
 

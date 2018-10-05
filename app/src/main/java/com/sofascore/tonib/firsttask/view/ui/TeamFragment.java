@@ -24,14 +24,12 @@ import android.widget.Toast;
 
 import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.service.InternetUtils;
-import com.sofascore.tonib.firsttask.service.model.AppDatabase;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.view.adapter.TeamAdapter;
 import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class TeamFragment extends Fragment {
 
@@ -100,11 +98,7 @@ public class TeamFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                new Handler().postDelayed(new Runnable() {
-                    @Override public void run() {
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
-                }, 3000);
+                swipeRefreshLayout.setRefreshing(true);
                 handler.removeCallbacksAndMessages(null);
                 checkForInternetConnectionAndPermissions();
                 handler.postDelayed(runnable, MY_PERIOD);
@@ -120,6 +114,7 @@ public class TeamFragment extends Fragment {
         apiTeams.observe(this, new Observer<List<Team>>() {
             @Override
             public void onChanged(@Nullable List<Team> teams) {
+                swipeRefreshLayout.setRefreshing(false);
                 Log.d("SYNCANJE", "Api sync");
                 adapter.updateApiList(teams);
             }
@@ -128,8 +123,15 @@ public class TeamFragment extends Fragment {
         dbTeams.observe(this, new Observer<List<Team>>() {
             @Override
             public void onChanged(@Nullable List<Team> teams) {
+                HashMap<Integer, Team> map = new HashMap<>();
+                if (teams != null){
+                    for(Team t : teams) {
+                        map.put(t.getTeamId(), t);
+                    }
+                }
+                swipeRefreshLayout.setRefreshing(false);
                 Log.d("SYNCANJE", "DB sync");
-                adapter.updateDbList(teams);
+                adapter.updateDbList(map);
             }
         });
     }
@@ -149,8 +151,14 @@ public class TeamFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy(){
-        super.onDestroy();
-        handler.removeCallbacksAndMessages(runnable);
+    public void onPause(){
+        super.onPause();
+        handler.removeCallbacksAndMessages(null);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        handler.post(runnable);
     }
 }

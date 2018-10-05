@@ -11,11 +11,12 @@ import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder>{
     private List<Team> apiTeams;
-    private List<Team> dbTeams;
+    private HashMap<Integer, Team> dbTeams;
     private TeamListViewModel teamListViewModel;
 
 
@@ -28,7 +29,7 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
         notifyDataSetChanged();
     }
 
-    public void updateDbList(List<Team> dbTeams){
+    public void updateDbList(HashMap<Integer, Team> dbTeams){
         this.dbTeams = dbTeams;
         notifyDataSetChanged();
     }
@@ -56,11 +57,8 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
         CheckBox cb = viewHolder.checkBox;
         tv.setText(team.getTeamName());
         Boolean contains = false;
-        for(Team t : dbTeams){
-            if (t.equals(team)){
-                contains = true;
-                break;
-            }
+        if (dbTeams != null){
+            contains = dbTeams.containsKey(team.getTeamId());
         }
         if (contains){
             cb.setChecked(true);
