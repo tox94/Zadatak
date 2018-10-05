@@ -10,10 +10,9 @@ import retrofit2.http.Path;
 
 public interface TeamsService {
 
-    @GET("teams/")
-    Call<List<Team>> getAllTeams();
+    @GET("mcc/{countryCode}/teams/")
+    Call<List<Team>> getAllTeams(@Path("countryCode") int countryCode);
 
-    @GET("teams/{id}")
-    Call<List<Team>> getTeam(@Path("id") int id);
-
+    @GET("mcc/{countryCode}/teams/{id}")
+    Call<List<Team>> getTeam(@Path("id") int id, @Path("countryCode") int countryCode);
 }

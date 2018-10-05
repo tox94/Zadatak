@@ -18,6 +18,8 @@ import java.util.List;
 
 public class TeamListViewModel extends AndroidViewModel {
 
+    private static final int[] COUNTRY_CODES = {218, 220, 238};
+
     private SportDao sportDao;
     private TeamDao teamDao;
     private ProjectRepository repo;
@@ -30,7 +32,7 @@ public class TeamListViewModel extends AndroidViewModel {
     }
 
     public MutableLiveData<List<Team>> getAllTeams() {
-        MutableLiveData<List<Team>> allTeams = repo.getAllTeams();
+        MutableLiveData<List<Team>> allTeams = repo.getAllTeams(COUNTRY_CODES);
         return allTeams;
     }
 

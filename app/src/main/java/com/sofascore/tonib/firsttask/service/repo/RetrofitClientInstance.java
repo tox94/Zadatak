@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitClientInstance {
 
     private static Retrofit retrofit;
-    public static final String TEAMS_API_URL = "https://mobile.sofascore.com/mobile/v4/mcc/234/";
+    public static final String TEAMS_API_URL = "https://mobile.sofascore.com/mobile/v4/";
 
     public static Retrofit getRetrofitInstance() {
         if (retrofit == null) {

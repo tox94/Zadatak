@@ -3,21 +3,20 @@ package com.sofascore.tonib.firsttask.service.model.entities;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
 
-@Entity(tableName = "team")
+@Entity(tableName = "team", primaryKeys = {"teamId", "teamName", "id"})
 public class Team {
 
     @NonNull
-    @PrimaryKey
     @SerializedName("id")
     @ColumnInfo(name = "teamId")
     private int teamId;
 
+    @NonNull
     @SerializedName("name")
     @ColumnInfo(name = "teamName")
     private String teamName;
@@ -29,6 +28,7 @@ public class Team {
     @ColumnInfo(name = "gender")
     private String gender;
 
+    @NonNull
     @Embedded
     private Sport sport;
 
@@ -38,7 +38,7 @@ public class Team {
     @ColumnInfo(name = "national")
     private Boolean national;
 
-    public Team(@NonNull int teamId, String teamName, String teamSlug, String gender, Sport sport, int userCount, Boolean national) {
+    public Team(@NonNull int teamId, @NonNull String teamName, String teamSlug, String gender, @NonNull Sport sport, int userCount, Boolean national) {
         this.teamId = teamId;
         this.teamName = teamName;
         this.teamSlug = teamSlug;
@@ -53,6 +53,7 @@ public class Team {
         return teamId;
     }
 
+    @NonNull
     public String getTeamName() {
         return teamName;
     }
@@ -65,6 +66,7 @@ public class Team {
         return gender;
     }
 
+    @NonNull
     public Sport getSport() {
         return sport;
     }
@@ -91,7 +93,8 @@ public class Team {
         }
         Team t = (Team) o;
 
-        if (t.getTeamId() == this.teamId) {
+        if (t.getTeamId() == this.teamId && t.getTeamName().equals(this.teamName)
+                && (t.getSport().getId() == this.getSport().getId())) {
             return true;
         }
 

@@ -19,21 +19,23 @@ public class ProjectRepository {
     }
 
 
-    public MutableLiveData<List<Team>> getAllTeams() {
+    public MutableLiveData<List<Team>> getAllTeams(int[] countryCodes) {
 
         final MutableLiveData<List<Team>> data = new MutableLiveData<>();
 
-        teamsService.getAllTeams().enqueue(new Callback<List<Team>>() {
-            @Override
-            public void onResponse(Call<List<Team>> call, Response<List<Team>> response) {
-                data.postValue(response.body());
-            }
+        for (int i : countryCodes) {
+            teamsService.getAllTeams(i).enqueue(new Callback<List<Team>>() {
+                @Override
+                public void onResponse(Call<List<Team>> call, Response<List<Team>> response) {
+                    data.postValue(response.body());
+                }
 
-            @Override
-            public void onFailure(Call<List<Team>> call, Throwable t) {
-                // error
-            }
-        });
+                @Override
+                public void onFailure(Call<List<Team>> call, Throwable t) {
+                    // error
+                }
+            });
+        }
         return data;
     }
 }
