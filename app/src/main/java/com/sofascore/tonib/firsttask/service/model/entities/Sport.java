@@ -31,4 +31,21 @@ public class Sport {
     public String getSlug() {
         return slug;
     }
+
+    @Override
+    public boolean equals(Object o){
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Sport)){
+            return false;
+        }
+        Sport t = (Sport) o;
+
+        if (t.getId() == this.id){
+            return true;
+        }
+
+        return false;
+    }
 }

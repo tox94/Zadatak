@@ -57,7 +57,7 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
         tv.setText(team.getTeamName());
         Boolean contains = false;
         for(Team t : dbTeams){
-            if (t.getTeamId() == team.getTeamId()){
+            if (t.equals(team)){
                 contains = true;
                 break;
             }

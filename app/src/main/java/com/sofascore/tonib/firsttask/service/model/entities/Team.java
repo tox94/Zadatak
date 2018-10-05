@@ -80,4 +80,22 @@ public class Team {
     public String getDetails(){
         return teamName + ", ";
     }
+
+    @Override
+    public boolean equals(Object o){
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Team)){
+            return false;
+        }
+        Team t = (Team) o;
+
+        if (t.getTeamId() == this.teamId){
+            return true;
+        }
+
+        return false;
+    }
+
 }
