@@ -80,7 +80,7 @@ public class Team {
     }
 
     public String getDetails() {
-        return teamName + ", ";
+        return teamName + " - " + sport.getSlug();
     }
 
     @Override

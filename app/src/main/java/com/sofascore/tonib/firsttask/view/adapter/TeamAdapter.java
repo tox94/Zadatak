@@ -29,13 +29,15 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
 
     public void updateApiList(List<Team> apiTeams) {
         this.apiTeams = apiTeams;
-        Collections.sort(apiTeams, new Comparator<Team>() {
-            @Override
-            public int compare(Team o1, Team o2) {
-                return o1.getTeamName().compareToIgnoreCase(o2.getTeamName());
-            }
-        });
-        Log.d("API broj", String.valueOf(apiTeams.size()));
+        if (apiTeams != null) {
+            Collections.sort(apiTeams, new Comparator<Team>() {
+                @Override
+                public int compare(Team o1, Team o2) {
+                    return o1.getTeamName().compareToIgnoreCase(o2.getTeamName());
+                }
+            });
+            Log.d("API broj", String.valueOf(apiTeams.size()));
+        }
         notifyDataSetChanged();
     }
 
@@ -65,7 +67,7 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
         final Team team = apiTeams.get(position);
         TextView tv = viewHolder.detailsTextView;
         CheckBox cb = viewHolder.checkBox;
-        tv.setText(team.getTeamName());
+        tv.setText(team.getDetails());
         Boolean contains = false;
         if (dbTeams != null) {
             contains = dbTeams.containsKey(team.getTeamId());

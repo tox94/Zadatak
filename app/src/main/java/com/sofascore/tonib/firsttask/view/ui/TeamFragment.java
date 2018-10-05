@@ -2,7 +2,7 @@ package com.sofascore.tonib.firsttask.view.ui;
 
 import android.Manifest;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.pm.PackageManager;
@@ -28,6 +28,7 @@ import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.view.adapter.TeamAdapter;
 import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -108,15 +109,39 @@ public class TeamFragment extends Fragment {
 
     private void getDataFromApi() {
         Log.d("SYNCANJE", "Sve");
-        final MutableLiveData<List<Team>> apiTeams = teamListViewModel.getAllTeams();
+        final MediatorLiveData<List<Team>> apiTeams = teamListViewModel.getAllTeams();
         final LiveData<List<Team>> dbTeams = teamListViewModel.getTeamsFromDb();
 
         apiTeams.observe(this, new Observer<List<Team>>() {
+            private int count = 0;
+            private ArrayList<Team> list;
+
             @Override
             public void onChanged(@Nullable List<Team> teams) {
-                swipeRefreshLayout.setRefreshing(false);
-                Log.d("SYNCANJE", "Api sync");
-                adapter.updateApiList(teams);
+                count++;
+                if (count == 1) {
+                    list = new ArrayList<>();
+                    Log.d("MEDIATOR", "Dodan 1.");
+                    for (Team t : teams){
+                        if (!list.contains(t)){
+                            list.add(t);
+                        }
+                    }
+                } else {
+                    for (Team t : teams){
+                        if (!list.contains(t)){
+                            list.add(t);
+                        }
+                    }
+                    Log.d("MEDIATOR", "Dodan iduci");
+                    if (count == 3) {
+                        Log.d("MEDIATOR", "Saljem");
+                        swipeRefreshLayout.setRefreshing(false);
+                        Log.d("SYNCANJE", "Api sync");
+                        adapter.updateApiList(list);
+                        count = 0;
+                    }
+                }
             }
         });
 

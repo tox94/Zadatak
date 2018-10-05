@@ -3,9 +3,12 @@ package com.sofascore.tonib.firsttask.viewmodel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.sofascore.tonib.firsttask.service.model.AppDatabase;
@@ -14,6 +17,7 @@ import com.sofascore.tonib.firsttask.service.model.daos.TeamDao;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.service.repo.ProjectRepository;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class TeamListViewModel extends AndroidViewModel {
@@ -31,9 +35,19 @@ public class TeamListViewModel extends AndroidViewModel {
         repo = new ProjectRepository();
     }
 
-    public MutableLiveData<List<Team>> getAllTeams() {
-        MutableLiveData<List<Team>> allTeams = repo.getAllTeams(COUNTRY_CODES);
-        return allTeams;
+    public MediatorLiveData<List<Team>> getAllTeams() {
+        MediatorLiveData<List<Team>> mediator = new MediatorLiveData<>();
+        /*for (int i : COUNTRY_CODES) {
+            LiveData<List<Team>> team = repo.getAllTeams(i);
+            mediator.addSource(team, value -> mediator.setValue(value));
+        }*/
+        LiveData<List<Team>> team1 = repo.getAllTeams(218);
+        mediator.addSource(team1, value -> mediator.setValue(value));
+        LiveData<List<Team>> team2 = repo.getAllTeams(220);
+        mediator.addSource(team2, value -> mediator.setValue(value));
+        LiveData<List<Team>> team3 = repo.getAllTeams(234);
+        mediator.addSource(team3, value -> mediator.setValue(value));
+        return mediator;
     }
 
     public LiveData<List<Team>> getTeamsFromDb() {
