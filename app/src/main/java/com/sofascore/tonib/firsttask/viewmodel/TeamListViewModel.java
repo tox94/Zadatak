@@ -14,6 +14,7 @@ import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.service.repo.ProjectRepository;
 import com.sofascore.tonib.firsttask.view.adapter.TeamAdapter;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class TeamListViewModel extends AndroidViewModel {
@@ -32,7 +34,7 @@ public class TeamListViewModel extends AndroidViewModel {
     private SportDao sportDao;
     private TeamDao teamDao;
     private ProjectRepository repo;
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    public CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public TeamListViewModel(@NonNull Application application) {
         super(application);
@@ -45,13 +47,28 @@ public class TeamListViewModel extends AndroidViewModel {
         Disposable disposable = Observable.merge(repo.getAllTeams(218), repo.getAllTeams(220), repo.getAllTeams(238))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .distinct()
                 .map(teams -> {
                     Collections.sort(teams, (t1, t2) -> t1.getTeamName().compareToIgnoreCase(t2.getTeamName()));
                     return teams;
                 })
-                .subscribe(teams -> {
-                    adapter.updateApiList(teams);
-                    swipeRefreshLayout.setRefreshing(false);
+                .subscribeWith(new DisposableObserver<List<Team>>() {
+                    ArrayList<Team> list = new ArrayList<>();
+                    @Override
+                    public void onNext(List<Team> teams) {
+                        list.addAll(teams);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // report error
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        adapter.updateApiList(list);
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
                 });
         compositeDisposable.add(disposable);
     }

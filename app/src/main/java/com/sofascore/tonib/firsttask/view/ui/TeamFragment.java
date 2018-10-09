@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,6 +97,15 @@ public class TeamFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        handler.post(runnable);
+        swipeRefreshLayout.setRefreshing(true);
+        handler.removeCallbacksAndMessages(null);
+        checkForInternetConnection();
+        handler.postDelayed(runnable, MY_PERIOD);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        teamListViewModel.compositeDisposable.clear();
     }
 }

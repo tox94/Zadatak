@@ -18,7 +18,6 @@ public class MainActivity extends AppCompatActivity {
     private AppDatabase db;
     private ViewPager vp;
     private FragmentPagerAdapter adapterViewPager;
-    private TeamListViewModel teamListViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
         vp = findViewById(R.id.viewPager);
         adapterViewPager = new CustomViewPagerAdapter(getSupportFragmentManager(), this);
         vp.setAdapter(adapterViewPager);
-        teamListViewModel = ViewModelProviders.of(this).get(TeamListViewModel.class);
     }
 
 

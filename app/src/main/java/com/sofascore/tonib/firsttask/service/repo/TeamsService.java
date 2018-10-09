@@ -12,7 +12,7 @@ import retrofit2.http.Path;
 public interface TeamsService {
 
     @GET("mcc/{countryCode}/teams/")
-    Observable  <List<Team>> getAllTeams(@Path("countryCode") int countryCode);
+    Observable<List<Team>> getAllTeams(@Path("countryCode") int countryCode);
 
     @GET("mcc/{countryCode}/teams/{id}")
     Single<Team> getTeam(@Path("id") int id, @Path("countryCode") int countryCode);
