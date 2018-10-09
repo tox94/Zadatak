@@ -1,7 +1,6 @@
 package com.sofascore.tonib.firsttask.view.adapter;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +11,6 @@ import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -29,15 +26,6 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
 
     public void updateApiList(List<Team> apiTeams) {
         this.apiTeams = apiTeams;
-        if (apiTeams != null) {
-            Collections.sort(apiTeams, new Comparator<Team>() {
-                @Override
-                public int compare(Team o1, Team o2) {
-                    return o1.getTeamName().compareToIgnoreCase(o2.getTeamName());
-                }
-            });
-            Log.d("API broj", String.valueOf(apiTeams.size()));
-        }
         notifyDataSetChanged();
     }
 
@@ -77,14 +65,11 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
         } else {
             cb.setChecked(false);
         }
-        cb.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (((CheckBox) v).isChecked()) {
-                    teamListViewModel.insertTeam(team);
-                } else {
-                    teamListViewModel.deleteTeam(team.getTeamId());
-                }
+        cb.setOnClickListener(v -> {
+            if (((CheckBox) v).isChecked()) {
+                teamListViewModel.insertTeam(team, this);
+            } else {
+                teamListViewModel.deleteTeam(team.getTeamId(), this);
             }
         });
     }

@@ -1,18 +1,11 @@
 package com.sofascore.tonib.firsttask.view.ui;
 
-import android.Manifest;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,17 +17,11 @@ import android.widget.Toast;
 
 import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.service.InternetUtils;
-import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.view.adapter.TeamAdapter;
 import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 public class TeamFragment extends Fragment {
 
-    private static final int MY_PERMISSION = 0;
     private static final int MY_PERIOD = 30000;
 
     private TeamListViewModel teamListViewModel;
@@ -66,26 +53,11 @@ public class TeamFragment extends Fragment {
         runnable = new Runnable() {
             @Override
             public void run() {
-                checkForInternetConnectionAndPermissions();
+                checkForInternetConnection();
                 handler.postDelayed(this, MY_PERIOD);
             }
         };
         handler.post(runnable);
-    }
-
-    private void checkForInternetConnectionAndPermissions() {
-        if (InternetUtils.isInternetAvailable(getActivity())) {
-            if (ContextCompat.checkSelfPermission(getActivity(),
-                    Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{Manifest.permission.INTERNET},
-                        MY_PERMISSION);
-            } else {
-                getDataFromApi();
-            }
-        } else {
-            Toast.makeText(getActivity(), "Please turn on internet access.", Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void initViews() {
@@ -96,83 +68,25 @@ public class TeamFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         swipeRefreshLayout = getActivity().findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                swipeRefreshLayout.setRefreshing(true);
-                handler.removeCallbacksAndMessages(null);
-                checkForInternetConnectionAndPermissions();
-                handler.postDelayed(runnable, MY_PERIOD);
-            }
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            swipeRefreshLayout.setRefreshing(true);
+            handler.removeCallbacksAndMessages(null);
+            checkForInternetConnection();
+            handler.postDelayed(runnable, MY_PERIOD);
         });
+    }
+
+    private void checkForInternetConnection() {
+        if (InternetUtils.isInternetAvailable(getActivity())) {
+            getDataFromApi();
+        } else {
+            Toast.makeText(getActivity(), "Please turn on internet access.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void getDataFromApi() {
-        Log.d("SYNCANJE", "Sve");
-        final MediatorLiveData<List<Team>> apiTeams = teamListViewModel.getAllTeams();
-        final LiveData<List<Team>> dbTeams = teamListViewModel.getTeamsFromDb();
-
-        apiTeams.observe(this, new Observer<List<Team>>() {
-            private int count = 0;
-            private ArrayList<Team> list;
-
-            @Override
-            public void onChanged(@Nullable List<Team> teams) {
-                count++;
-                if (count == 1) {
-                    list = new ArrayList<>();
-                    Log.d("MEDIATOR", "Dodan 1.");
-                    for (Team t : teams){
-                        if (!list.contains(t)){
-                            list.add(t);
-                        }
-                    }
-                } else {
-                    for (Team t : teams){
-                        if (!list.contains(t)){
-                            list.add(t);
-                        }
-                    }
-                    Log.d("MEDIATOR", "Dodan iduci");
-                    if (count == 3) {
-                        Log.d("MEDIATOR", "Saljem");
-                        swipeRefreshLayout.setRefreshing(false);
-                        Log.d("SYNCANJE", "Api sync");
-                        adapter.updateApiList(list);
-                        count = 0;
-                    }
-                }
-            }
-        });
-
-        dbTeams.observe(this, new Observer<List<Team>>() {
-            @Override
-            public void onChanged(@Nullable List<Team> teams) {
-                HashMap<Integer, Team> map = new HashMap<>();
-                if (teams != null) {
-                    for (Team t : teams) {
-                        map.put(t.getTeamId(), t);
-                    }
-                }
-                swipeRefreshLayout.setRefreshing(false);
-                Log.d("SYNCANJE", "DB sync");
-                adapter.updateDbList(map);
-            }
-        });
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSION: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getDataFromApi();
-                } else {
-                    Toast.makeText(getActivity(), "Please enable all permissions.", Toast.LENGTH_SHORT).show();
-                }
-            }
-            return;
-        }
+        teamListViewModel.fetchTeamsFromAPI(adapter, swipeRefreshLayout);
+        teamListViewModel.fetchTeamsFromDB(adapter, swipeRefreshLayout);
     }
 
     @Override

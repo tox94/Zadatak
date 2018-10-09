@@ -27,6 +27,7 @@ public abstract class AppDatabase extends RoomDatabase {
         synchronized (sLock) {
             if (INSTANCE == null) {
                 INSTANCE = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, "teams.db")
+                        .fallbackToDestructiveMigration()
                         .allowMainThreadQueries()
                         .build();
             }
@@ -34,5 +35,6 @@ public abstract class AppDatabase extends RoomDatabase {
             return INSTANCE;
         }
     }
+
 
 }

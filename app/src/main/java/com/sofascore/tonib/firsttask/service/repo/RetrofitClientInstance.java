@@ -3,6 +3,7 @@ package com.sofascore.tonib.firsttask.service.repo;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 class RetrofitClientInstance {
@@ -19,6 +20,7 @@ class RetrofitClientInstance {
             retrofit = new retrofit2.Retrofit.Builder()
                     .baseUrl(TEAMS_API_URL)
                     .client(client)
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
