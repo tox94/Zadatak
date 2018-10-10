@@ -5,12 +5,16 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
+import com.sofascore.tonib.firsttask.service.model.daos.DetailedPositionsDao;
+import com.sofascore.tonib.firsttask.service.model.daos.PlayerDao;
 import com.sofascore.tonib.firsttask.service.model.daos.SportDao;
 import com.sofascore.tonib.firsttask.service.model.daos.TeamDao;
+import com.sofascore.tonib.firsttask.service.model.entities.DetailedPositions;
+import com.sofascore.tonib.firsttask.service.model.entities.Player;
 import com.sofascore.tonib.firsttask.service.model.entities.Sport;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 
-@Database(entities = {Sport.class, Team.class},
+@Database(entities = {Sport.class, Team.class, Player.class, DetailedPositions.class},
         version = 1,
         exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
@@ -20,6 +24,10 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract SportDao sportDao();
 
     public abstract TeamDao teamDao();
+
+    public abstract PlayerDao playerDao();
+
+    public abstract DetailedPositionsDao detailedPositionsDao();
 
     private static final Object sLock = new Object();
 

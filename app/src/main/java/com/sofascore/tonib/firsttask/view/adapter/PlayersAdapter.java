@@ -9,27 +9,26 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.sofascore.tonib.firsttask.R;
+import com.sofascore.tonib.firsttask.service.model.entities.Player;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.viewmodel.FavoritesListViewModel;
-import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
+import com.sofascore.tonib.firsttask.viewmodel.PlayersListViewModel;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
-public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.TeamViewHolder> {
-    private List<Team> teams;
-    private FavoritesListViewModel favoritesListViewModel;
+public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.TeamViewHolder> {
+    private List<Player> players;
+    private PlayersListViewModel playersListViewModel;
 
 
-    public FavoritesAdapter(FavoritesListViewModel favoritesListViewModel) {
-        this.favoritesListViewModel = favoritesListViewModel;
-        teams = new ArrayList<>();
+    public PlayersAdapter(PlayersListViewModel playersListViewModel) {
+        this.playersListViewModel = playersListViewModel;
+        players = new ArrayList<>();
     }
 
-    public void updatePlayers(List<Team> list) {
-        this.teams = list;
+    public void updatePlayers(List<Player> list) {
+        this.players = list;
         notifyDataSetChanged();
     }
 
@@ -51,21 +50,21 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Team
 
     @Override
     public void onBindViewHolder(TeamViewHolder viewHolder, int position) {
-        final Team team = teams.get(position);
+        final Player player = players.get(position);
         TextView tv = viewHolder.detailsTextView;
         CheckBox cb = viewHolder.checkBox;
-        tv.setText(team.getDetails());
+        tv.setText(player.getDetails());
         cb.setChecked(true);
         cb.setOnClickListener(v -> {
-            Log.d("CHECKBOXCLICK", "Brisi " + team.getTeamName());
-            favoritesListViewModel.deleteTeam(team.getTeamId(), this);
+            Log.d("CHECKBOXCLICK", "Brisi " + player.getPlayerName());
+            playersListViewModel.deletePlayer(player.getPlayerId(), this);
         });
     }
 
     @Override
     public int getItemCount() {
-        if (teams != null) {
-            return teams.size();
+        if (players != null) {
+            return players.size();
         } else {
             return 0;
         }

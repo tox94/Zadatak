@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">FirstTask</string>
 
-    <string name="team_fragment_title">Team</string>
+    <string name="team_fragment_title">Teams</string>
     <string name="favorites_fragment_title">Favorites</string>
+    <string name="player_fragment_title">Players</string>
     <string name="empty_fragment_title">Empty</string>
     <string name="empty_fragment_text">This is an empty fragment</string>
     <string name="no_entries_picture">Picture</string>

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.view.ui.EmptyFragment;
 import com.sofascore.tonib.firsttask.view.ui.FavoritesFragment;
+import com.sofascore.tonib.firsttask.view.ui.PlayerFragment;
 import com.sofascore.tonib.firsttask.view.ui.TeamFragment;
 import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
@@ -20,6 +21,7 @@ public class CustomViewPagerAdapter extends FragmentPagerAdapter {
     private Context context;
     private TeamFragment teamFragment;
     private FavoritesFragment favoritesFragment;
+    private PlayerFragment playerFragment;
     private EmptyFragment emptyFragment;
 
     public CustomViewPagerAdapter(FragmentManager fm, Context context) {
@@ -27,6 +29,7 @@ public class CustomViewPagerAdapter extends FragmentPagerAdapter {
         this.context = context;
         this.teamFragment = new TeamFragment();
         this.favoritesFragment = new FavoritesFragment();
+        this.playerFragment = new PlayerFragment();
         this.emptyFragment = new EmptyFragment();
     }
 
@@ -43,6 +46,8 @@ public class CustomViewPagerAdapter extends FragmentPagerAdapter {
             case 1:
                 return favoritesFragment;
             case 2:
+                return playerFragment;
+            case 3:
                 return emptyFragment;
             default:
                 return null;
