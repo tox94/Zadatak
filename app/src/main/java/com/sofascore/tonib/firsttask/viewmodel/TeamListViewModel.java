@@ -1,5 +1,6 @@
 package com.sofascore.tonib.firsttask.viewmodel;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.os.AsyncTask;
@@ -19,11 +20,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -96,20 +99,48 @@ public class TeamListViewModel extends AndroidViewModel {
         compositeDisposable.add(disposable);
     }
 
+    @SuppressLint("CheckResult")
     public void insertTeam(final Team team, TeamAdapter teamAdapter) {
-        AsyncTask.execute(() -> {
-            teamDao.insertTeam(team);
-            Log.d("DEBUG", "Dodano " + team.getTeamId() + " " + team.getTeamName());
-            sportDao.insertSport(team.getSport());
-        });
-        fetchTeamsFromDB(teamAdapter, null);
+        Completable.fromAction(()->teamDao.insertTeam(team))
+                .subscribeWith(new DisposableCompletableObserver() {
+
+                    @Override
+                    public void onStart() {
+                        sportDao.insertSport(team.getSport());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete(){
+                        fetchTeamsFromDB(teamAdapter, null);
+                    }
+                });
     }
 
+    @SuppressLint("CheckResult")
     public void deleteTeam(final int teamId, TeamAdapter teamAdapter) {
-        AsyncTask.execute(() -> {
-            Log.d("DEBUG", "Pobrisano " + teamId);
-            teamDao.deleteTeam(teamId);
-        });
-        fetchTeamsFromDB(teamAdapter, null);
+        Completable.fromAction(()->teamDao.deleteTeam(teamId))
+                .subscribeWith(new DisposableCompletableObserver() {
+
+
+                    @Override
+                    public void onStart() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete(){
+                        fetchTeamsFromDB(teamAdapter, null);
+                    }
+                });
     }
 }

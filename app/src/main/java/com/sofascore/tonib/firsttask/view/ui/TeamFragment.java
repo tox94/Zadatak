@@ -99,8 +99,7 @@ public class TeamFragment extends Fragment {
         super.onResume();
         swipeRefreshLayout.setRefreshing(true);
         handler.removeCallbacksAndMessages(null);
-        checkForInternetConnection();
-        handler.postDelayed(runnable, MY_PERIOD);
+        handler.post(runnable);
     }
 
     @Override

@@ -14,7 +14,6 @@ import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -81,8 +80,10 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
         }
         cb.setOnClickListener(v -> {
             if (((CheckBox) v).isChecked()) {
+                Log.d("CHECKBOXCLICK", "Dodaj " + team.getTeamName());
                 teamListViewModel.insertTeam(team, this);
             } else {
+                Log.d("CHECKBOXCLICK", "Brisi " + team.getTeamName());
                 teamListViewModel.deleteTeam(team.getTeamId(), this);
             }
         });
