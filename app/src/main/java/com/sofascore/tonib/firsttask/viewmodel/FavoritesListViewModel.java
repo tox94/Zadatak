@@ -3,6 +3,7 @@ package com.sofascore.tonib.firsttask.viewmodel;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 
@@ -32,6 +33,7 @@ public class FavoritesListViewModel extends AndroidViewModel {
 
     private TeamDao teamDao;
     public CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private MutableLiveData<List<Team>> favoriteTeams;
 
     public FavoritesListViewModel(@NonNull Application application) {
         super(application);
@@ -73,5 +75,12 @@ public class FavoritesListViewModel extends AndroidViewModel {
                         fetchTeamsFromDB(favoritesAdapter);
                     }
                 });
+    }
+
+    public MutableLiveData<List<Team>> getFavoriteTeams() {
+        if (favoriteTeams == null) {
+            favoriteTeams = new MutableLiveData<List<Team>>();
+        }
+        return favoriteTeams;
     }
 }

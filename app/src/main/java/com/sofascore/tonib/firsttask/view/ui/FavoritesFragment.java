@@ -1,6 +1,7 @@
 package com.sofascore.tonib.firsttask.view.ui;
 
 import android.app.Activity;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,10 +14,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sofascore.tonib.firsttask.R;
+import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.view.adapter.FavoritesAdapter;
 import com.sofascore.tonib.firsttask.view.adapter.TeamAdapter;
 import com.sofascore.tonib.firsttask.viewmodel.EmptyViewModel;
 import com.sofascore.tonib.firsttask.viewmodel.FavoritesListViewModel;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class FavoritesFragment extends Fragment {
 
@@ -41,6 +46,7 @@ public class FavoritesFragment extends Fragment {
         adapter = new FavoritesAdapter(favoritesListViewModel);
 
         initViews();
+        initLiveData();
         getData();
     }
 
@@ -50,6 +56,11 @@ public class FavoritesFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
+    }
+
+    private void initLiveData() {
+        final Observer<List<Team>> favoritesObserver = teams -> adapter.updateFavoritesList(teams);
+        favoritesListViewModel.getFavoriteTeams().observe(this, favoritesObserver);
     }
 
     public void getData(){

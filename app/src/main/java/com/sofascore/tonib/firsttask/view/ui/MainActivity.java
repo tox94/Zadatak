@@ -9,6 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.service.model.AppDatabase;
 import com.sofascore.tonib.firsttask.view.viewpager.CustomViewPagerAdapter;
+import com.sofascore.tonib.firsttask.viewmodel.EmptyViewModel;
+import com.sofascore.tonib.firsttask.viewmodel.FavoritesListViewModel;
+import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -39,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
                 switch(i){
                     case 0:
                         TeamFragment teamFragment = (TeamFragment) adapterViewPager.getItem(i);
-                        teamFragment.checkForInternetConnection();
+                        teamFragment.getDataFromDb();
                         break;
                     case 1:
                         FavoritesFragment favoritesFragment = (FavoritesFragment) adapterViewPager.getItem(i);

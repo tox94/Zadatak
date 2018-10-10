@@ -3,11 +3,9 @@ package com.sofascore.tonib.firsttask.viewmodel;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
-import android.os.AsyncTask;
+import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import com.sofascore.tonib.firsttask.service.model.AppDatabase;
 import com.sofascore.tonib.firsttask.service.model.daos.SportDao;
@@ -18,7 +16,6 @@ import com.sofascore.tonib.firsttask.view.adapter.TeamAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +25,6 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function3;
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableObserver;
@@ -42,6 +38,8 @@ public class TeamListViewModel extends AndroidViewModel {
     private TeamDao teamDao;
     private ProjectRepository repo;
     public CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private MutableLiveData<List<Team>> apiTeams;
+    private MutableLiveData<List<Team>> dbTeams;
 
     public TeamListViewModel(@NonNull Application application) {
         super(application);
@@ -50,7 +48,7 @@ public class TeamListViewModel extends AndroidViewModel {
         repo = new ProjectRepository();
     }
 
-    public void fetchTeamsFromAPI(final TeamAdapter adapter, final SwipeRefreshLayout swipeRefreshLayout) {
+    public void fetchTeamsFromAPI(final SwipeRefreshLayout swipeRefreshLayout) {
         Disposable disposable = Observable.zip(repo.getAllTeams(218), repo.getAllTeams(220),
                 repo.getAllTeams(238), (Function3<List<Team>, List<Team>, List<Team>, List<Team>>) (teams, teams2, teams3) -> {
                     ArrayList<Team> list = new ArrayList<>();
@@ -69,6 +67,7 @@ public class TeamListViewModel extends AndroidViewModel {
                 })
                 .subscribeWith(new DisposableObserver<List<Team>>() {
                     ArrayList<Team> list = new ArrayList<>();
+
                     @Override
                     public void onNext(List<Team> teams) {
                         list.addAll(teams);
@@ -81,14 +80,16 @@ public class TeamListViewModel extends AndroidViewModel {
 
                     @Override
                     public void onComplete() {
-                        adapter.updateApiList(list);
-                        swipeRefreshLayout.setRefreshing(false);
+                        if (swipeRefreshLayout != null) {
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        apiTeams.postValue(list);
                     }
                 });
         compositeDisposable.add(disposable);
     }
 
-    public void fetchTeamsFromDB(TeamAdapter adapter, final SwipeRefreshLayout swipeRefreshLayout) {
+    public void fetchTeamsFromDB(final SwipeRefreshLayout swipeRefreshLayout) {
         Disposable disposable = teamDao.getAllTeams()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -97,23 +98,17 @@ public class TeamListViewModel extends AndroidViewModel {
                     return teams;
                 })
                 .subscribe(teams -> {
-                    HashMap<Integer, Team> map = new HashMap<>();
-                    if (teams != null) {
-                        for (Team t : teams) {
-                            map.put(t.getTeamId(), t);
-                        }
-                    }
-                    adapter.updateDbList(map);
                     if (swipeRefreshLayout != null) {
                         swipeRefreshLayout.setRefreshing(false);
                     }
+                    dbTeams.postValue(teams);
                 });
         compositeDisposable.add(disposable);
     }
 
     @SuppressLint("CheckResult")
     public void insertTeam(final Team team, TeamAdapter teamAdapter) {
-        Completable.fromAction(()->teamDao.insertTeam(team))
+        Completable.fromAction(() -> teamDao.insertTeam(team))
                 .subscribeWith(new DisposableCompletableObserver() {
 
                     @Override
@@ -127,17 +122,16 @@ public class TeamListViewModel extends AndroidViewModel {
                     }
 
                     @Override
-                    public void onComplete(){
-                        fetchTeamsFromDB(teamAdapter, null);
+                    public void onComplete() {
+                        fetchTeamsFromDB(null);
                     }
                 });
     }
 
     @SuppressLint("CheckResult")
     public void deleteTeam(final int teamId, TeamAdapter teamAdapter) {
-        Completable.fromAction(()->teamDao.deleteTeam(teamId))
+        Completable.fromAction(() -> teamDao.deleteTeam(teamId))
                 .subscribeWith(new DisposableCompletableObserver() {
-
 
                     @Override
                     public void onStart() {
@@ -150,9 +144,23 @@ public class TeamListViewModel extends AndroidViewModel {
                     }
 
                     @Override
-                    public void onComplete(){
-                        fetchTeamsFromDB(teamAdapter, null);
+                    public void onComplete() {
+                        fetchTeamsFromDB(null);
                     }
                 });
+    }
+
+    public MutableLiveData<List<Team>> getApiTeams() {
+        if (apiTeams == null) {
+            apiTeams = new MutableLiveData<>();
+        }
+        return apiTeams;
+    }
+
+    public MutableLiveData<List<Team>> getDbTeams() {
+        if (dbTeams == null) {
+            dbTeams = new MutableLiveData<>();
+        }
+        return dbTeams;
     }
 }

@@ -25,7 +25,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Team
 
     public FavoritesAdapter(FavoritesListViewModel favoritesListViewModel) {
         this.favoritesListViewModel = favoritesListViewModel;
-        teams = new ArrayList<Team>();
+        teams = new ArrayList<>();
     }
 
     public void updateFavoritesList(List<Team> list) {

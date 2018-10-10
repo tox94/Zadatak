@@ -1,6 +1,7 @@
 package com.sofascore.tonib.firsttask.view.ui;
 
 import android.app.Activity;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,8 +18,12 @@ import android.widget.Toast;
 
 import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.service.InternetUtils;
+import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.view.adapter.TeamAdapter;
 import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class TeamFragment extends Fragment {
 
@@ -45,9 +50,11 @@ public class TeamFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         teamListViewModel = ViewModelProviders.of(this).get(TeamListViewModel.class);
+
         adapter = new TeamAdapter(teamListViewModel);
 
         initViews();
+        initLiveData();
 
         handler = new Handler();
         runnable = new Runnable() {
@@ -57,6 +64,7 @@ public class TeamFragment extends Fragment {
                 handler.postDelayed(this, MY_PERIOD);
             }
         };
+
         handler.post(runnable);
     }
 
@@ -76,17 +84,41 @@ public class TeamFragment extends Fragment {
         });
     }
 
+    private void initLiveData() {
+        final Observer<List<Team>> apiTeamObserver = teams -> adapter.updateApiList(teams);
+
+        final Observer<List<Team>> dbTeamObserver = teams -> {
+            HashMap<Integer, Team> map = new HashMap<>();
+            if (teams != null) {
+                for (Team t : teams) {
+                    map.put(t.getTeamId(), t);
+                }
+            }
+            if (swipeRefreshLayout != null) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+            adapter.updateDbList(map);
+        };
+
+        teamListViewModel.getApiTeams().observe(this, apiTeamObserver);
+        teamListViewModel.getDbTeams().observe(this, dbTeamObserver);
+    }
+
     public void checkForInternetConnection() {
         if (InternetUtils.isInternetAvailable(getActivity())) {
             getDataFromApi();
+            getDataFromDb();
         } else {
             Toast.makeText(getActivity(), "Please turn on internet access.", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void getDataFromApi() {
-        teamListViewModel.fetchTeamsFromAPI(adapter, swipeRefreshLayout);
-        teamListViewModel.fetchTeamsFromDB(adapter, swipeRefreshLayout);
+        teamListViewModel.fetchTeamsFromAPI(swipeRefreshLayout);
+    }
+
+    public void getDataFromDb() {
+        teamListViewModel.fetchTeamsFromDB(swipeRefreshLayout);
     }
 
     @Override
