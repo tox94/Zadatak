@@ -1,5 +1,6 @@
 package com.sofascore.tonib.firsttask.view.ui;
 
+import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.os.Handler;
@@ -75,7 +76,7 @@ public class TeamFragment extends Fragment {
         });
     }
 
-    private void checkForInternetConnection() {
+    public void checkForInternetConnection() {
         if (InternetUtils.isInternetAvailable(getActivity())) {
             getDataFromApi();
         } else {

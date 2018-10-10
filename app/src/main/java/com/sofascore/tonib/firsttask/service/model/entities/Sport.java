@@ -48,4 +48,9 @@ public class Sport {
 
         return false;
     }
+
+    @Override
+    public int hashCode(){
+        return id + name.hashCode() + slug.hashCode();
+    }
 }

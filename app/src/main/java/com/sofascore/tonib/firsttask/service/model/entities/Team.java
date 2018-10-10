@@ -101,4 +101,8 @@ public class Team {
         return false;
     }
 
+    @Override
+    public int hashCode(){
+        return teamName.hashCode() + teamId * teamSlug.hashCode() + sport.hashCode();
+    }
 }

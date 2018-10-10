@@ -6,6 +6,7 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.sofascore.tonib.firsttask.service.model.AppDatabase;
@@ -18,7 +19,9 @@ import com.sofascore.tonib.firsttask.view.adapter.TeamAdapter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -26,6 +29,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function3;
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -47,10 +51,18 @@ public class TeamListViewModel extends AndroidViewModel {
     }
 
     public void fetchTeamsFromAPI(final TeamAdapter adapter, final SwipeRefreshLayout swipeRefreshLayout) {
-        Disposable disposable = Observable.merge(repo.getAllTeams(218), repo.getAllTeams(220), repo.getAllTeams(238))
+        Disposable disposable = Observable.zip(repo.getAllTeams(218), repo.getAllTeams(220),
+                repo.getAllTeams(238), (Function3<List<Team>, List<Team>, List<Team>, List<Team>>) (teams, teams2, teams3) -> {
+                    ArrayList<Team> list = new ArrayList<>();
+                    Set<Team> set = new HashSet<>();
+                    set.addAll(teams);
+                    set.addAll(teams2);
+                    set.addAll(teams3);
+                    list.addAll(set);
+                    return list;
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .distinct()
                 .map(teams -> {
                     Collections.sort(teams, (t1, t2) -> t1.getTeamName().compareToIgnoreCase(t2.getTeamName()));
                     return teams;
@@ -111,7 +123,7 @@ public class TeamListViewModel extends AndroidViewModel {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        // report Error
                     }
 
                     @Override
@@ -129,12 +141,12 @@ public class TeamListViewModel extends AndroidViewModel {
 
                     @Override
                     public void onStart() {
-
+                        // do nothing
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        // report Error
                     }
 
                     @Override

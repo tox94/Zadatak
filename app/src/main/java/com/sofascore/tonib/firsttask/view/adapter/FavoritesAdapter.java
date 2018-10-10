@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
+import com.sofascore.tonib.firsttask.viewmodel.FavoritesListViewModel;
 import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
 import java.util.ArrayList;
@@ -17,25 +18,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder> {
-    private List<Team> apiTeams;
-    private HashMap<Integer, Team> dbTeams;
-    private TeamListViewModel teamListViewModel;
+public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.TeamViewHolder> {
+    private List<Team> teams;
+    private FavoritesListViewModel favoritesListViewModel;
 
 
-    public TeamAdapter(TeamListViewModel teamListViewModel) {
-        this.teamListViewModel = teamListViewModel;
+    public FavoritesAdapter(FavoritesListViewModel favoritesListViewModel) {
+        this.favoritesListViewModel = favoritesListViewModel;
+        teams = new ArrayList<Team>();
     }
 
-    public void updateApiList(List<Team> list) {
-        apiTeams = new ArrayList<>();
-        apiTeams.addAll(list);
-        Log.d("ADAPTER_BROJ", "Broj timova: " + apiTeams.size() + ", prvi: " + apiTeams.get(0).getTeamName() + "\nzadnji: " + apiTeams.get(apiTeams.size() - 1).getTeamName());
-        notifyDataSetChanged();
-    }
-
-    public void updateDbList(HashMap<Integer, Team> dbTeams) {
-        this.dbTeams = dbTeams;
+    public void updateFavoritesList(List<Team> list) {
+        this.teams = list;
         notifyDataSetChanged();
     }
 
@@ -57,34 +51,21 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
 
     @Override
     public void onBindViewHolder(TeamViewHolder viewHolder, int position) {
-        final Team team = apiTeams.get(position);
+        final Team team = teams.get(position);
         TextView tv = viewHolder.detailsTextView;
         CheckBox cb = viewHolder.checkBox;
         tv.setText(team.getDetails());
-        Boolean contains = false;
-        if (dbTeams != null) {
-            contains = dbTeams.containsKey(team.getTeamId());
-        }
-        if (contains) {
-            cb.setChecked(true);
-        } else {
-            cb.setChecked(false);
-        }
+        cb.setChecked(true);
         cb.setOnClickListener(v -> {
-            if (((CheckBox) v).isChecked()) {
-                Log.d("CHECKBOXCLICK", "Dodaj " + team.getTeamName());
-                teamListViewModel.insertTeam(team, this);
-            } else {
-                Log.d("CHECKBOXCLICK", "Brisi " + team.getTeamName());
-                teamListViewModel.deleteTeam(team.getTeamId(), this);
-            }
+            Log.d("CHECKBOXCLICK", "Brisi " + team.getTeamName());
+            favoritesListViewModel.deleteTeam(team.getTeamId(), this);
         });
     }
 
     @Override
     public int getItemCount() {
-        if (apiTeams != null) {
-            return apiTeams.size();
+        if (teams != null) {
+            return teams.size();
         } else {
             return 0;
         }
