@@ -1,16 +1,15 @@
 package com.sofascore.tonib.firsttask.view.ui;
 
-import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,19 +21,16 @@ import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.view.adapter.TeamAdapter;
 import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
-import java.util.HashMap;
 import java.util.List;
+
+import io.reactivex.disposables.CompositeDisposable;
 
 public class TeamFragment extends Fragment {
 
-    private static final int MY_PERIOD = 30000;
-
     private TeamListViewModel teamListViewModel;
-    private RecyclerView recyclerView;
-    private TeamAdapter adapter;
-    private SwipeRefreshLayout swipeRefreshLayout;
-    private Handler handler;
-    private Runnable runnable;
+    private RecyclerView teamRecyclerView;
+    private TeamAdapter teamAdapter;
+    private SwipeRefreshLayout teamSwipeRefreshLayout;
 
     public static TeamFragment newInstance() {
         return new TeamFragment();
@@ -50,53 +46,42 @@ public class TeamFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         teamListViewModel = ViewModelProviders.of(this).get(TeamListViewModel.class);
-        adapter = new TeamAdapter(teamListViewModel);
+        teamAdapter = new TeamAdapter(teamListViewModel);
 
         initViews();
         initLiveData();
 
-        handler = new Handler();
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                checkForInternetConnection();
-                handler.postDelayed(this, MY_PERIOD);
-            }
-        };
-
-        handler.post(runnable);
+        checkForInternetConnection();
     }
 
     private void initViews() {
-        recyclerView = getActivity().findViewById(R.id.teamRecyclerView);
+        teamRecyclerView = getActivity().findViewById(R.id.teamRecyclerView);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(adapter);
+        teamRecyclerView.setLayoutManager(layoutManager);
+        teamRecyclerView.setHasFixedSize(true);
+        teamRecyclerView.setAdapter(teamAdapter);
 
-        swipeRefreshLayout = getActivity().findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            swipeRefreshLayout.setRefreshing(true);
-            handler.removeCallbacksAndMessages(null);
-            checkForInternetConnection();
-            handler.postDelayed(runnable, MY_PERIOD);
+        teamSwipeRefreshLayout = getActivity().findViewById(R.id.teamSwipeRefreshLayout);
+        teamSwipeRefreshLayout.setOnRefreshListener(() -> {
+            Log.d("REFRESH_TEAM", "Tu sam");
+            teamSwipeRefreshLayout.setRefreshing(true);
+            restartCompositeDisposable();
         });
     }
 
     private void initLiveData() {
-        final Observer<List<Team>> apiTeamObserver = teams -> adapter.updateApiList(teams);
+        final Observer<List<Team>> apiTeamObserver = teams -> {
+            if (teamSwipeRefreshLayout.isRefreshing()) {
+                teamSwipeRefreshLayout.setRefreshing(false);
+            }
+            teamAdapter.updateApiList(teams);
+        };
 
         final Observer<List<Team>> dbTeamObserver = teams -> {
-            HashMap<Integer, Team> map = new HashMap<>();
-            if (teams != null) {
-                for (Team t : teams) {
-                    map.put(t.getTeamId(), t);
-                }
+            if (teamSwipeRefreshLayout.isRefreshing()) {
+                teamSwipeRefreshLayout.setRefreshing(false);
             }
-            if (swipeRefreshLayout != null) {
-                swipeRefreshLayout.setRefreshing(false);
-            }
-            adapter.updateDbList(map);
+            teamAdapter.updateDbList(teams);
         };
 
         teamListViewModel.getApiTeams().observe(this, apiTeamObserver);
@@ -113,30 +98,34 @@ public class TeamFragment extends Fragment {
     }
 
     private void getDataFromApi() {
-        teamListViewModel.fetchTeamsFromAPI(swipeRefreshLayout);
+        teamListViewModel.fetchTeamsFromAPI();
     }
 
     public void getDataFromDb() {
-        teamListViewModel.fetchTeamsFromDB(swipeRefreshLayout);
+        teamListViewModel.fetchTeamsFromDB();
+    }
+
+    private void restartCompositeDisposable(){
+        teamListViewModel.teamsCompositeDisposable.dispose();
+        teamListViewModel.teamsCompositeDisposable = new CompositeDisposable();
+        checkForInternetConnection();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        handler.removeCallbacksAndMessages(null);
+        teamListViewModel.teamsCompositeDisposable.dispose();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        swipeRefreshLayout.setRefreshing(true);
-        handler.removeCallbacksAndMessages(null);
-        handler.post(runnable);
+        restartCompositeDisposable();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        teamListViewModel.compositeDisposable.clear();
+        teamListViewModel.teamsCompositeDisposable.dispose();
     }
 }

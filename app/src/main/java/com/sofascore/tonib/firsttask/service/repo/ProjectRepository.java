@@ -5,6 +5,7 @@ import com.sofascore.tonib.firsttask.service.model.entities.Team;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
 public class ProjectRepository {
@@ -15,15 +16,15 @@ public class ProjectRepository {
         teamsService = RetrofitClientInstance.getRetrofitInstance().create(TeamsService.class);
     }
 
-    public Observable<List<Team>> getAllTeams(int countryCode) {
+    public Flowable<List<Team>> getAllTeams(int countryCode) {
         return teamsService.getAllTeams(countryCode);
     }
 
-    public Observable<List<Player>> getAllPlayers(int countryCode) {
+    public Flowable<List<Player>> getAllPlayers(int countryCode) {
         return teamsService.getAllPlayers(countryCode);
     }
 
-    public Observable<Team> getTeamDetails(int teamId) {
+    public Flowable<Team> getTeamDetails(int teamId) {
         return teamsService.getTeamDetails(teamId);
     }
  }

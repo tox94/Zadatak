@@ -20,16 +20,16 @@ public class CustomViewPagerAdapter extends FragmentPagerAdapter {
     private static int TAB_COUNT = 4;
     private Context context;
     private TeamFragment teamFragment;
-    private FavoritesFragment favoritesFragment;
     private PlayerFragment playerFragment;
+    private FavoritesFragment favoritesFragment;
     private EmptyFragment emptyFragment;
 
     public CustomViewPagerAdapter(FragmentManager fm, Context context) {
         super(fm);
         this.context = context;
         this.teamFragment = new TeamFragment();
-        this.favoritesFragment = new FavoritesFragment();
         this.playerFragment = new PlayerFragment();
+        this.favoritesFragment = new FavoritesFragment();
         this.emptyFragment = new EmptyFragment();
     }
 

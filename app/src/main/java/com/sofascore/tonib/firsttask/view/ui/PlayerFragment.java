@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,8 @@ import com.sofascore.tonib.firsttask.viewmodel.PlayersListViewModel;
 
 import java.util.List;
 
+import io.reactivex.disposables.CompositeDisposable;
+
 public class PlayerFragment extends Fragment {
 
     private static final int MY_PERIOD = 30000;
@@ -34,8 +37,6 @@ public class PlayerFragment extends Fragment {
     private RecyclerView recyclerView;
     private PlayersAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private Handler handler;
-    private Runnable runnable;
 
     public static PlayerFragment newInstance() {
         return new PlayerFragment();
@@ -56,16 +57,7 @@ public class PlayerFragment extends Fragment {
         initViews();
         initLiveData();
 
-        handler = new Handler();
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                checkForInternetConnection();
-                handler.postDelayed(this, MY_PERIOD);
-            }
-        };
-
-        handler.post(runnable);
+        checkForInternetConnection();
     }
 
     private void initViews() {
@@ -77,16 +69,25 @@ public class PlayerFragment extends Fragment {
 
         swipeRefreshLayout = getActivity().findViewById(R.id.playerSwipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(() -> {
+            Log.d("REFRESH_PLAYER", "Tu sam");
             swipeRefreshLayout.setRefreshing(true);
-            handler.removeCallbacksAndMessages(null);
-            checkForInternetConnection();
-            handler.postDelayed(runnable, MY_PERIOD);
+            restartCompositeDisposable();
         });
     }
 
     private void initLiveData() {
-        final Observer<List<Player>> apiPlayersObserver = players -> adapter.updateApiPlayers(players);
-        final Observer<List<Player>> dbPlayersObserver = players -> adapter.updateDbPlayers(players);
+        final Observer<List<Player>> apiPlayersObserver = players -> {
+            if(swipeRefreshLayout.isRefreshing()){
+                swipeRefreshLayout.setRefreshing(false);
+            }
+            adapter.updateApiPlayers(players);
+        };
+        final Observer<List<Player>> dbPlayersObserver = players -> {
+            if(swipeRefreshLayout.isRefreshing()){
+                swipeRefreshLayout.setRefreshing(false);
+            }
+            adapter.updateDbPlayers(players);
+        };
 
         playersListViewModel.getApiPlayers().observe(this, apiPlayersObserver);
         playersListViewModel.getDbPlayers().observe(this, dbPlayersObserver);
@@ -102,30 +103,35 @@ public class PlayerFragment extends Fragment {
     }
 
     private void getDataFromApi() {
-        playersListViewModel.fetchPlayersFromAPI(swipeRefreshLayout);
+        playersListViewModel.fetchPlayersFromAPI();
     }
 
     public void getDataFromDb() {
-        playersListViewModel.fetchPlayersFromDB(swipeRefreshLayout);
+        playersListViewModel.fetchPlayersFromDB();
+    }
+
+    private void restartCompositeDisposable(){
+        playersListViewModel.compositeDisposable.dispose();
+        playersListViewModel.compositeDisposable = new CompositeDisposable();
+        checkForInternetConnection();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        handler.removeCallbacksAndMessages(null);
+        playersListViewModel.compositeDisposable.dispose();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         swipeRefreshLayout.setRefreshing(true);
-        handler.removeCallbacksAndMessages(null);
-        handler.post(runnable);
+        restartCompositeDisposable();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        playersListViewModel.compositeDisposable.clear();
+        playersListViewModel.compositeDisposable.dispose();
     }
 }

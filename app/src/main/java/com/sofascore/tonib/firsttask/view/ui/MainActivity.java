@@ -47,9 +47,7 @@ public class MainActivity extends AppCompatActivity {
                         favoritesFragment.getData();
                         break;
                 }
-
             }
-
             @Override
             public void onPageScrollStateChanged(int i) {
             }

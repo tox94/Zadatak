@@ -11,15 +11,19 @@ import com.sofascore.tonib.firsttask.service.model.AppDatabase;
 import com.sofascore.tonib.firsttask.service.model.daos.PlayerDao;
 import com.sofascore.tonib.firsttask.service.model.entities.Player;
 import com.sofascore.tonib.firsttask.service.repo.ProjectRepository;
-import com.sofascore.tonib.firsttask.view.adapter.PlayersAdapter;
+
+import org.reactivestreams.Publisher;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -38,7 +42,7 @@ public class PlayersListViewModel extends AndroidViewModel {
         repo = new ProjectRepository();
     }
 
-    public void fetchPlayersFromAPI(final SwipeRefreshLayout swipeRefreshLayout) {
+    public void fetchPlayersFromAPI() {
         Disposable disposable = repo.getAllPlayers(PLAYERS_COUNTRY_CODE)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -46,17 +50,19 @@ public class PlayersListViewModel extends AndroidViewModel {
                     Collections.sort(players, (p1, p2) -> p1.getPlayerName().compareToIgnoreCase(p2.getPlayerName()));
                     return players;
                 })
-                .subscribe(players -> {
-                        if (swipeRefreshLayout != null) {
-                            swipeRefreshLayout.setRefreshing(false);
-                        }
-                        apiPlayers.postValue(players);
+                .repeatWhen(new Function<Flowable<Object>, Publisher<?>>() {
+                    @Override
+                    public Publisher<?> apply(Flowable<Object> objectFlowable) throws Exception {
+                        return objectFlowable.delay(10, TimeUnit.SECONDS);
                     }
+                })
+                .subscribe(players -> apiPlayers.postValue(players)
                 );
+
         compositeDisposable.add(disposable);
     }
 
-    public void fetchPlayersFromDB(final SwipeRefreshLayout swipeRefreshLayout) {
+    public void fetchPlayersFromDB() {
         Disposable disposable = playerDao.getAllPlayers()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -64,17 +70,20 @@ public class PlayersListViewModel extends AndroidViewModel {
                     Collections.sort(players, (p1, p2) -> p1.getPlayerName().compareToIgnoreCase(p2.getPlayerName()));
                     return players;
                 })
-                .subscribe(players -> {
-                    if (swipeRefreshLayout != null) {
-                        swipeRefreshLayout.setRefreshing(false);
+                .repeatWhen(new Function<Flowable<Object>, Publisher<?>>() {
+                    @Override
+                    public Publisher<?> apply(Flowable<Object> objectFlowable) throws Exception {
+                        return objectFlowable.delay(10, TimeUnit.SECONDS);
                     }
+                })
+                .subscribe(players -> {
                     this.dbPlayers.postValue(players);
                 });
         compositeDisposable.add(disposable);
     }
 
     @SuppressLint("CheckResult")
-    public void insertPlayer(final Player player, PlayersAdapter playersAdapter) {
+    public void insertPlayer(final Player player) {
         Completable.fromAction(() -> playerDao.insertPlayer(player))
                 .subscribeWith(new DisposableCompletableObserver() {
 
@@ -90,13 +99,13 @@ public class PlayersListViewModel extends AndroidViewModel {
 
                     @Override
                     public void onComplete() {
-                        fetchPlayersFromDB(null);
+                        fetchPlayersFromDB();
                     }
                 });
     }
 
     @SuppressLint("CheckResult")
-    public void deletePlayer(final int playerId, PlayersAdapter playersAdapter) {
+    public void deletePlayer(final int playerId) {
         Completable.fromAction(()->playerDao.deletePlayer(playerId))
                 .subscribeWith(new DisposableCompletableObserver() {
 
@@ -112,7 +121,7 @@ public class PlayersListViewModel extends AndroidViewModel {
 
                     @Override
                     public void onComplete(){
-                        fetchPlayersFromDB(null);
+                        fetchPlayersFromDB();
                     }
                 });
     }

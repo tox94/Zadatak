@@ -12,7 +12,6 @@ import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,14 +26,19 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
     }
 
     public void updateApiList(List<Team> list) {
-        apiTeams = new ArrayList<>();
-        apiTeams.addAll(list);
+        apiTeams = list;
         Log.d("ADAPTER_BROJ", "Broj timova: " + apiTeams.size() + ", prvi: " + apiTeams.get(0).getTeamName() + "\nzadnji: " + apiTeams.get(apiTeams.size() - 1).getTeamName());
         notifyDataSetChanged();
     }
 
-    public void updateDbList(HashMap<Integer, Team> dbTeams) {
-        this.dbTeams = dbTeams;
+    public void updateDbList(List<Team> list) {
+        HashMap<Integer, Team> map = new HashMap<>();
+        if (list != null) {
+            for (Team t : list) {
+                map.put(t.getTeamId(), t);
+            }
+        }
+        this.dbTeams = map;
         notifyDataSetChanged();
     }
 
@@ -59,7 +63,11 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
         final Team team = apiTeams.get(position);
         TextView tv = viewHolder.detailsTextView;
         CheckBox cb = viewHolder.checkBox;
-        tv.setText(team.getDetails());
+        String details = team.getTeamName();
+        /*if (team.getManager() != null) {
+            details += " - " + team.getManager().getManagerName();
+        }*/
+        tv.setText(details);
         Boolean contains = false;
         if (dbTeams != null) {
             contains = dbTeams.containsKey(team.getTeamId());
@@ -72,10 +80,10 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
         cb.setOnClickListener(v -> {
             if (((CheckBox) v).isChecked()) {
                 Log.d("CHECKBOXCLICK", "Dodaj " + team.getTeamName());
-                teamListViewModel.insertTeam(team, this);
+                teamListViewModel.insertTeam(team);
             } else {
                 Log.d("CHECKBOXCLICK", "Brisi " + team.getTeamName());
-                teamListViewModel.deleteTeam(team.getTeamId(), this);
+                teamListViewModel.deleteTeam(team.getTeamId());
             }
         });
     }

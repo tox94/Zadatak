@@ -12,14 +12,11 @@ import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.service.model.entities.Player;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.viewmodel.FavoritesListViewModel;
-import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
-public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.TeamViewHolder> {
+public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.FavoritesViewHolder> {
     private List<Team> teams;
     private List<Player> players;
     private FavoritesListViewModel favoritesListViewModel;
@@ -40,11 +37,11 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Team
         notifyDataSetChanged();
     }
 
-    public static class TeamViewHolder extends RecyclerView.ViewHolder {
+    public static class FavoritesViewHolder extends RecyclerView.ViewHolder {
         private TextView detailsTextView;
         private CheckBox checkBox;
 
-        public TeamViewHolder(View v) {
+        public FavoritesViewHolder(View v) {
             super(v);
             detailsTextView = v.findViewById(R.id.teamDetailsTextView);
             checkBox = v.findViewById(R.id.saveCheckBox);
@@ -52,12 +49,12 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Team
     }
 
     @Override
-    public TeamViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new TeamViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.team_list_item, parent, false));
+    public FavoritesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new FavoritesViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.team_list_item, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(TeamViewHolder viewHolder, int position) {
+    public void onBindViewHolder(FavoritesViewHolder viewHolder, int position) {
         final Team team = teams.get(position);
         TextView tv = viewHolder.detailsTextView;
         CheckBox cb = viewHolder.checkBox;

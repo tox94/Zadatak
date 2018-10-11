@@ -5,29 +5,30 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
-import android.support.v4.widget.SwipeRefreshLayout;
 
 import com.sofascore.tonib.firsttask.service.model.AppDatabase;
 import com.sofascore.tonib.firsttask.service.model.daos.SportDao;
 import com.sofascore.tonib.firsttask.service.model.daos.TeamDao;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.service.repo.ProjectRepository;
-import com.sofascore.tonib.firsttask.view.adapter.TeamAdapter;
+
+import org.reactivestreams.Publisher;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
-import io.reactivex.Observable;
+import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.functions.Function3;
 import io.reactivex.observers.DisposableCompletableObserver;
-import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class TeamListViewModel extends AndroidViewModel {
@@ -37,7 +38,9 @@ public class TeamListViewModel extends AndroidViewModel {
     private SportDao sportDao;
     private TeamDao teamDao;
     private ProjectRepository repo;
-    public CompositeDisposable compositeDisposable = new CompositeDisposable();
+    public CompositeDisposable teamsCompositeDisposable = new CompositeDisposable();
+    public Disposable apiDisposable;
+    public Disposable dbDisposable;
     private MutableLiveData<List<Team>> apiTeams;
     private MutableLiveData<List<Team>> dbTeams;
 
@@ -48,8 +51,8 @@ public class TeamListViewModel extends AndroidViewModel {
         repo = new ProjectRepository();
     }
 
-    public void fetchTeamsFromAPI(final SwipeRefreshLayout swipeRefreshLayout) {
-        Disposable disposable = Observable.zip(repo.getAllTeams(218), repo.getAllTeams(220),
+    public void fetchTeamsFromAPI() {
+        apiDisposable = Flowable.zip(repo.getAllTeams(218), repo.getAllTeams(220),
                 repo.getAllTeams(238), (Function3<List<Team>, List<Team>, List<Team>, List<Team>>) (teams, teams2, teams3) -> {
                     ArrayList<Team> list = new ArrayList<>();
                     Set<Team> set = new HashSet<>();
@@ -59,55 +62,49 @@ public class TeamListViewModel extends AndroidViewModel {
                     list.addAll(set);
                     return list;
                 })
-                .subscribeOn(Schedulers.io())
+                .flatMap(Flowable::fromIterable)
+                .take(5)
+                .flatMap(team -> repo.getTeamDetails(team.getTeamId()))
+                .toSortedList((t1, t2) -> t1.getTeamName().compareToIgnoreCase(t2.getTeamName()))
+                .toFlowable()
                 .observeOn(AndroidSchedulers.mainThread())
-                .map(teams -> {
-                    Collections.sort(teams, (t1, t2) -> t1.getTeamName().compareToIgnoreCase(t2.getTeamName()));
-                    return teams;
-                })
-                .subscribeWith(new DisposableObserver<List<Team>>() {
-                    ArrayList<Team> list = new ArrayList<>();
-
+                .repeatWhen(new Function<Flowable<Object>, Publisher<?>>() {
                     @Override
-                    public void onNext(List<Team> teams) {
-                        list.addAll(teams);
+                    public Publisher<?> apply(Flowable<Object> objectFlowable) throws Exception {
+                        return objectFlowable.delay(10, TimeUnit.SECONDS);
                     }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        // report error
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        if (swipeRefreshLayout != null) {
-                            swipeRefreshLayout.setRefreshing(false);
-                        }
-                        apiTeams.postValue(list);
-                    }
-                });
-        compositeDisposable.add(disposable);
-    }
-
-    public void fetchTeamsFromDB(final SwipeRefreshLayout swipeRefreshLayout) {
-        Disposable disposable = teamDao.getAllTeams()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .map(teams -> {
-                    Collections.sort(teams, (t1, t2) -> t1.getTeamName().compareToIgnoreCase(t2.getTeamName()));
-                    return teams;
                 })
                 .subscribe(teams -> {
-                    if (swipeRefreshLayout != null) {
-                        swipeRefreshLayout.setRefreshing(false);
+                    apiTeams.postValue(teams);
+                }, throwable -> {
+
+                });
+        teamsCompositeDisposable.add(apiDisposable);
+    }
+
+    public void fetchTeamsFromDB() {
+        dbDisposable = teamDao.getAllTeams()
+                .repeat()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(teams -> {
+                    Collections.sort(teams, (t1, t2) -> t1.getTeamName().compareToIgnoreCase(t2.getTeamName()));
+                    return teams;
+                })
+                .repeatWhen(new Function<Flowable<Object>, Publisher<?>>() {
+                    @Override
+                    public Publisher<?> apply(Flowable<Object> objectFlowable) throws Exception {
+                        return objectFlowable.delay(10, TimeUnit.SECONDS);
                     }
+                })
+                .subscribe(teams -> {
                     dbTeams.postValue(teams);
                 });
-        compositeDisposable.add(disposable);
+        teamsCompositeDisposable.add(dbDisposable);
     }
 
     @SuppressLint("CheckResult")
-    public void insertTeam(final Team team, TeamAdapter teamAdapter) {
+    public void insertTeam(final Team team) {
         Completable.fromAction(() -> teamDao.insertTeam(team))
                 .subscribeWith(new DisposableCompletableObserver() {
 
@@ -123,13 +120,13 @@ public class TeamListViewModel extends AndroidViewModel {
 
                     @Override
                     public void onComplete() {
-                        fetchTeamsFromDB(null);
+                        fetchTeamsFromDB();
                     }
                 });
     }
 
     @SuppressLint("CheckResult")
-    public void deleteTeam(final int teamId, TeamAdapter teamAdapter) {
+    public void deleteTeam(final int teamId) {
         Completable.fromAction(() -> teamDao.deleteTeam(teamId))
                 .subscribeWith(new DisposableCompletableObserver() {
 
@@ -145,7 +142,7 @@ public class TeamListViewModel extends AndroidViewModel {
 
                     @Override
                     public void onComplete() {
-                        fetchTeamsFromDB(null);
+                        fetchTeamsFromDB();
                     }
                 });
     }

@@ -27,8 +27,8 @@ import java.util.List;
 public class FavoritesFragment extends Fragment {
 
     private FavoritesListViewModel favoritesListViewModel;
-    private RecyclerView recyclerView;
-    private FavoritesAdapter adapter;
+    private RecyclerView favoritesRecyclerView;
+    private FavoritesAdapter favoritesAdapter;
 
     public static FavoritesFragment newInstance() {
         return new FavoritesFragment();
@@ -44,7 +44,7 @@ public class FavoritesFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         favoritesListViewModel = ViewModelProviders.of(this).get(FavoritesListViewModel.class);
-        adapter = new FavoritesAdapter(favoritesListViewModel);
+        favoritesAdapter = new FavoritesAdapter(favoritesListViewModel);
 
         initViews();
         initLiveData();
@@ -52,22 +52,22 @@ public class FavoritesFragment extends Fragment {
     }
 
     private void initViews() {
-        recyclerView = getActivity().findViewById(R.id.favoritesRecyclerView);
+        favoritesRecyclerView = getActivity().findViewById(R.id.favoritesRecyclerView);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(adapter);
+        favoritesRecyclerView.setLayoutManager(layoutManager);
+        favoritesRecyclerView.setHasFixedSize(true);
+        favoritesRecyclerView.setAdapter(favoritesAdapter);
     }
 
     private void initLiveData() {
-        final Observer<List<Team>> favoriteTeamsObserver = teams -> adapter.updateFavoriteTeams(teams);
-        final Observer<List<Player>> favoritePlayersObserver = players -> adapter.updateFavoritePlayers(players);
+        final Observer<List<Team>> favoriteTeamsObserver = teams -> favoritesAdapter.updateFavoriteTeams(teams);
+        final Observer<List<Player>> favoritePlayersObserver = players -> favoritesAdapter.updateFavoritePlayers(players);
         favoritesListViewModel.getFavoriteTeams().observe(this, favoriteTeamsObserver);
         favoritesListViewModel.getFavoritePlayers().observe(this, favoritePlayersObserver);
     }
 
     public void getData(){
-        favoritesListViewModel.fetchTeamsFromDB(adapter);
-        favoritesListViewModel.fetchPlayersFromDB(adapter);
+        favoritesListViewModel.fetchTeamsFromDB(favoritesAdapter);
+        favoritesListViewModel.fetchPlayersFromDB(favoritesAdapter);
     }
 }

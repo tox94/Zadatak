@@ -78,10 +78,10 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.TeamView
         cb.setOnClickListener(v -> {
             if (((CheckBox) v).isChecked()) {
                 Log.d("CHECKBOXCLICK", "Dodaj " + player.getPlayerName());
-                playersListViewModel.insertPlayer(player, this);
+                playersListViewModel.insertPlayer(player);
             } else {
                 Log.d("CHECKBOXCLICK", "Brisi " + player.getPlayerName());
-                playersListViewModel.deletePlayer(player.getPlayerId(), this);
+                playersListViewModel.deletePlayer(player.getPlayerId());
             }
         });
     }

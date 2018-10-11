@@ -10,16 +10,17 @@ import com.sofascore.tonib.firsttask.service.model.entities.Team;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 
 @Dao
 public interface PlayerDao {
 
     @Query("SELECT * FROM player")
-    Single<List<Player>> getAllPlayers();
+    Flowable<List<Player>> getAllPlayers();
 
     @Query("SELECT * FROM player WHERE id LIKE :id")
-    Single<Team> getPlayerById(int id);
+    Flowable<Team> getPlayerById(int id);
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

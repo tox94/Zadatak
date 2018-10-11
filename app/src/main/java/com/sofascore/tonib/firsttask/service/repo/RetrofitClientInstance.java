@@ -1,5 +1,6 @@
 package com.sofascore.tonib.firsttask.service.repo;
 
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -14,13 +15,13 @@ class RetrofitClientInstance {
     public static Retrofit getRetrofitInstance() {
         if (retrofit == null) {
             HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
             OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
             retrofit = new retrofit2.Retrofit.Builder()
                     .baseUrl(TEAMS_API_URL)
                     .client(client)
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
