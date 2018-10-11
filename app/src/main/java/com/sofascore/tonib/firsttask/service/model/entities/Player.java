@@ -60,8 +60,9 @@ public class Player {
     @ColumnInfo(name = "hasTransferHistory")
     private Boolean hasTransferHistory;
 
-    @ColumnInfo(name = "userCount")
-    private int userCount;
+    @SerializedName("userCount")
+    @ColumnInfo(name = "playerUserCount")
+    private int playerUserCount;
 
     @ColumnInfo(name = "heightMeters")
     private float heightMeters;
@@ -90,14 +91,11 @@ public class Player {
     @ColumnInfo(name = "contractUntilTimestamp")
     private String contractUntilTimestamp;
 
-    @Embedded
-    private DetailedPositions detailedPositions;
-
     public String getDetails(){
-        return "test";
+        return playerName;
     }
 
-    public Player(@NonNull int playerId, @NonNull String playerName, String playerSlug, String shortName, @NonNull Team team, String playerGender, String position, int weight, int shirtNumber, int height, String preferredFoot, String nationality, String marketValueCurrency, Boolean hasTransferHistory, int userCount, float heightMeters, Boolean hasImage, int age, String dateOfBirthFormated, int dateOfBirthTimestamp, String flag, String nationalityIOC, int marketValue, String contractUntilTimestamp, DetailedPositions detailedPositions) {
+    public Player(@NonNull int playerId, @NonNull String playerName, String playerSlug, String shortName, @NonNull Team team, String playerGender, String position, int weight, int shirtNumber, int height, String preferredFoot, String nationality, String marketValueCurrency, Boolean hasTransferHistory, int playerUserCount, float heightMeters, Boolean hasImage, int age, String dateOfBirthFormated, int dateOfBirthTimestamp, String flag, String nationalityIOC, int marketValue, String contractUntilTimestamp) {
         this.playerId = playerId;
         this.playerName = playerName;
         this.playerSlug = playerSlug;
@@ -112,7 +110,7 @@ public class Player {
         this.nationality = nationality;
         this.marketValueCurrency = marketValueCurrency;
         this.hasTransferHistory = hasTransferHistory;
-        this.userCount = userCount;
+        this.playerUserCount = playerUserCount;
         this.heightMeters = heightMeters;
         this.hasImage = hasImage;
         this.age = age;
@@ -122,7 +120,6 @@ public class Player {
         this.nationalityIOC = nationalityIOC;
         this.marketValue = marketValue;
         this.contractUntilTimestamp = contractUntilTimestamp;
-        this.detailedPositions = detailedPositions;
     }
 
     @NonNull
@@ -184,8 +181,8 @@ public class Player {
         return hasTransferHistory;
     }
 
-    public int getUserCount() {
-        return userCount;
+    public int getPlayerUserCount() {
+        return playerUserCount;
     }
 
     public float getHeightMeters() {
@@ -222,10 +219,6 @@ public class Player {
 
     public String getContractUntilTimestamp() {
         return contractUntilTimestamp;
-    }
-
-    public DetailedPositions getDetailedPositions() {
-        return detailedPositions;
     }
 
     @Override

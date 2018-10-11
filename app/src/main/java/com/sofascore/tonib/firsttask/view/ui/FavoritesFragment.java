@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sofascore.tonib.firsttask.R;
+import com.sofascore.tonib.firsttask.service.model.entities.Player;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.view.adapter.FavoritesAdapter;
 import com.sofascore.tonib.firsttask.view.adapter.TeamAdapter;
@@ -59,11 +60,14 @@ public class FavoritesFragment extends Fragment {
     }
 
     private void initLiveData() {
-        final Observer<List<Team>> favoritesObserver = teams -> adapter.updateFavoritesList(teams);
-        favoritesListViewModel.getFavoriteTeams().observe(this, favoritesObserver);
+        final Observer<List<Team>> favoriteTeamsObserver = teams -> adapter.updateFavoriteTeams(teams);
+        final Observer<List<Player>> favoritePlayersObserver = players -> adapter.updateFavoritePlayers(players);
+        favoritesListViewModel.getFavoriteTeams().observe(this, favoriteTeamsObserver);
+        favoritesListViewModel.getFavoritePlayers().observe(this, favoritePlayersObserver);
     }
 
     public void getData(){
         favoritesListViewModel.fetchTeamsFromDB(adapter);
+        favoritesListViewModel.fetchPlayersFromDB(adapter);
     }
 }

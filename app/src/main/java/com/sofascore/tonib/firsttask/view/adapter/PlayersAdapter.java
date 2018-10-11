@@ -10,25 +10,37 @@ import android.widget.TextView;
 
 import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.service.model.entities.Player;
-import com.sofascore.tonib.firsttask.service.model.entities.Team;
-import com.sofascore.tonib.firsttask.viewmodel.FavoritesListViewModel;
 import com.sofascore.tonib.firsttask.viewmodel.PlayersListViewModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.TeamViewHolder> {
-    private List<Player> players;
+    private List<Player> apiPlayers;
+    private HashMap<Integer, Player> dbPlayers;
     private PlayersListViewModel playersListViewModel;
 
 
     public PlayersAdapter(PlayersListViewModel playersListViewModel) {
         this.playersListViewModel = playersListViewModel;
-        players = new ArrayList<>();
+        apiPlayers = new ArrayList<>();
+        dbPlayers = new HashMap<>();
     }
 
-    public void updatePlayers(List<Player> list) {
-        this.players = list;
+    public void updateApiPlayers(List<Player> list) {
+        this.apiPlayers = list;
+        notifyDataSetChanged();
+    }
+
+    public void updateDbPlayers(List<Player> list) {
+        HashMap<Integer, Player> map = new HashMap<>();
+        if (list != null) {
+            for (Player p : list) {
+                map.put(p.getPlayerId(), p);
+            }
+        }
+        this.dbPlayers = map;
         notifyDataSetChanged();
     }
 
@@ -38,33 +50,46 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.TeamView
 
         public TeamViewHolder(View v) {
             super(v);
-            detailsTextView = v.findViewById(R.id.teamDetailsTextView);
-            checkBox = v.findViewById(R.id.saveCheckBox);
+            detailsTextView = v.findViewById(R.id.playerDetailsTextView);
+            checkBox = v.findViewById(R.id.playerSaveCheckBox);
         }
     }
 
     @Override
     public TeamViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new TeamViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.team_list_item, parent, false));
+        return new TeamViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.player_list_item, parent, false));
     }
 
     @Override
     public void onBindViewHolder(TeamViewHolder viewHolder, int position) {
-        final Player player = players.get(position);
+        final Player player = apiPlayers.get(position);
         TextView tv = viewHolder.detailsTextView;
         CheckBox cb = viewHolder.checkBox;
         tv.setText(player.getDetails());
-        cb.setChecked(true);
+        Boolean contains = false;
+        if (dbPlayers != null) {
+            contains = dbPlayers.containsKey(player.getPlayerId());
+        }
+        if (contains) {
+            cb.setChecked(true);
+        } else {
+            cb.setChecked(false);
+        }
         cb.setOnClickListener(v -> {
-            Log.d("CHECKBOXCLICK", "Brisi " + player.getPlayerName());
-            playersListViewModel.deletePlayer(player.getPlayerId(), this);
+            if (((CheckBox) v).isChecked()) {
+                Log.d("CHECKBOXCLICK", "Dodaj " + player.getPlayerName());
+                playersListViewModel.insertPlayer(player, this);
+            } else {
+                Log.d("CHECKBOXCLICK", "Brisi " + player.getPlayerName());
+                playersListViewModel.deletePlayer(player.getPlayerId(), this);
+            }
         });
     }
 
     @Override
     public int getItemCount() {
-        if (players != null) {
-            return players.size();
+        if (apiPlayers != null) {
+            return apiPlayers.size();
         } else {
             return 0;
         }

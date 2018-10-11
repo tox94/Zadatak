@@ -8,8 +8,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 
 import com.sofascore.tonib.firsttask.service.model.AppDatabase;
+import com.sofascore.tonib.firsttask.service.model.daos.PlayerDao;
 import com.sofascore.tonib.firsttask.service.model.daos.SportDao;
 import com.sofascore.tonib.firsttask.service.model.daos.TeamDao;
+import com.sofascore.tonib.firsttask.service.model.entities.Player;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.service.repo.ProjectRepository;
 import com.sofascore.tonib.firsttask.view.adapter.FavoritesAdapter;
@@ -32,12 +34,15 @@ import io.reactivex.schedulers.Schedulers;
 public class FavoritesListViewModel extends AndroidViewModel {
 
     private TeamDao teamDao;
+    private PlayerDao playerDao;
     public CompositeDisposable compositeDisposable = new CompositeDisposable();
     private MutableLiveData<List<Team>> favoriteTeams;
+    private MutableLiveData<List<Player>> favoritePlayers;
 
     public FavoritesListViewModel(@NonNull Application application) {
         super(application);
         teamDao = AppDatabase.getInstance(application).teamDao();
+        playerDao = AppDatabase.getInstance(application).playerDao();
     }
 
     public void fetchTeamsFromDB(FavoritesAdapter adapter) {
@@ -49,7 +54,21 @@ public class FavoritesListViewModel extends AndroidViewModel {
                     return teams;
                 })
                 .subscribe(teams -> {
-                    adapter.updateFavoritesList(teams);
+                    adapter.updateFavoriteTeams(teams);
+                });
+        compositeDisposable.add(disposable);
+    }
+
+    public void fetchPlayersFromDB(FavoritesAdapter adapter) {
+        Disposable disposable = playerDao.getAllPlayers()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(players -> {
+                    Collections.sort(players, (p1, p2) -> p1.getPlayerName().compareToIgnoreCase(p2.getPlayerName()));
+                    return players;
+                })
+                .subscribe(players -> {
+                    adapter.updateFavoritePlayers(players);
                 });
         compositeDisposable.add(disposable);
     }
@@ -58,7 +77,6 @@ public class FavoritesListViewModel extends AndroidViewModel {
     public void deleteTeam(final int teamId, FavoritesAdapter favoritesAdapter) {
         Completable.fromAction(()->teamDao.deleteTeam(teamId))
                 .subscribeWith(new DisposableCompletableObserver() {
-
 
                     @Override
                     public void onStart() {
@@ -77,10 +95,39 @@ public class FavoritesListViewModel extends AndroidViewModel {
                 });
     }
 
+    @SuppressLint("CheckResult")
+    public void deletePlayer(final int playerId, FavoritesAdapter favoritesAdapter) {
+        Completable.fromAction(()->playerDao.deletePlayer(playerId))
+                .subscribeWith(new DisposableCompletableObserver() {
+
+                    @Override
+                    public void onStart() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // report Error
+                    }
+
+                    @Override
+                    public void onComplete(){
+                        fetchPlayersFromDB(favoritesAdapter);
+                    }
+                });
+    }
+
     public MutableLiveData<List<Team>> getFavoriteTeams() {
         if (favoriteTeams == null) {
             favoriteTeams = new MutableLiveData<List<Team>>();
         }
         return favoriteTeams;
+    }
+
+    public MutableLiveData<List<Player>> getFavoritePlayers() {
+        if (favoritePlayers == null) {
+            favoritePlayers = new MutableLiveData<List<Player>>();
+        }
+        return favoritePlayers;
     }
 }

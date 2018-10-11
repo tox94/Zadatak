@@ -15,6 +15,9 @@ public interface TeamsService {
     @GET("mcc/{countryCode}/teams/")
     Observable<List<Team>> getAllTeams(@Path("countryCode") int countryCode);
 
+    @GET("team/{teamId}/details/")
+    Observable<Team> getTeamDetails(@Path("teamId") int teamId);
+
     @GET("mcc/{countryCode}/players/")
     Observable<List<Player>> getAllPlayers(@Path("countryCode") int countryCode);
 

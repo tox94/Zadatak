@@ -50,7 +50,6 @@ public class TeamFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         teamListViewModel = ViewModelProviders.of(this).get(TeamListViewModel.class);
-
         adapter = new TeamAdapter(teamListViewModel);
 
         initViews();

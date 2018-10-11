@@ -17,7 +17,7 @@ import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
 public class CustomViewPagerAdapter extends FragmentPagerAdapter {
 
-    private static int TAB_COUNT = 3;
+    private static int TAB_COUNT = 4;
     private Context context;
     private TeamFragment teamFragment;
     private FavoritesFragment favoritesFragment;
@@ -44,9 +44,9 @@ public class CustomViewPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return teamFragment;
             case 1:
-                return favoritesFragment;
-            case 2:
                 return playerFragment;
+            case 2:
+                return favoritesFragment;
             case 3:
                 return emptyFragment;
             default:
@@ -61,8 +61,10 @@ public class CustomViewPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return context.getString(R.string.team_fragment_title);
             case 1:
-                return context.getString(R.string.favorites_fragment_title);
+                return context.getString(R.string.player_fragment_title);
             case 2:
+                return context.getString(R.string.favorites_fragment_title);
+            case 3:
                 return context.getString(R.string.empty_fragment_title);
             default:
                 return context.getString(R.string.app_name);

@@ -4,6 +4,7 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -32,20 +33,26 @@ public class Team {
     @Embedded
     private Sport sport;
 
-    @ColumnInfo(name = "userCount")
-    private int userCount;
+    @SerializedName("userCount")
+    @ColumnInfo(name = "teamUserCount")
+    private int teamUserCount;
 
     @ColumnInfo(name = "national")
     private Boolean national;
 
-    public Team(@NonNull int teamId, @NonNull String teamName, String teamSlug, String gender, @NonNull Sport sport, int userCount, Boolean national) {
+    @Nullable
+    @Embedded
+    private Manager manager;
+
+    public Team(@NonNull int teamId, @NonNull String teamName, String teamSlug, String gender, @NonNull Sport sport, int teamUserCount, Boolean national, @Nullable Manager manager) {
         this.teamId = teamId;
         this.teamName = teamName;
         this.teamSlug = teamSlug;
         this.gender = gender;
         this.sport = sport;
-        this.userCount = userCount;
+        this.teamUserCount = teamUserCount;
         this.national = national;
+        this.manager = manager;
     }
 
     @NonNull
@@ -71,16 +78,21 @@ public class Team {
         return sport;
     }
 
-    public int getUserCount() {
-        return userCount;
+    public int getTeamUserCount() {
+        return teamUserCount;
     }
 
     public Boolean getNational() {
         return national;
     }
 
-    public String getDetails() {
-        return teamName + " - " + sport.getSlug();
+    public String getDetails(){
+        return teamName + " - " + getSport().getName();
+    }
+
+    @Nullable
+    public Manager getManager() {
+        return manager;
     }
 
     @Override

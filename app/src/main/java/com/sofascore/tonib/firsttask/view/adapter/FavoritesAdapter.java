@@ -9,6 +9,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.sofascore.tonib.firsttask.R;
+import com.sofascore.tonib.firsttask.service.model.entities.Player;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.viewmodel.FavoritesListViewModel;
 import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
@@ -20,6 +21,7 @@ import java.util.List;
 
 public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.TeamViewHolder> {
     private List<Team> teams;
+    private List<Player> players;
     private FavoritesListViewModel favoritesListViewModel;
 
 
@@ -28,8 +30,13 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Team
         teams = new ArrayList<>();
     }
 
-    public void updatePlayers(List<Team> list) {
+    public void updateFavoriteTeams(List<Team> list) {
         this.teams = list;
+        notifyDataSetChanged();
+    }
+
+    public void updateFavoritePlayers(List<Player> list) {
+        this.players = list;
         notifyDataSetChanged();
     }
 

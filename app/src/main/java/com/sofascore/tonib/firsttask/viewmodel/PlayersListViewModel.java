@@ -9,10 +9,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 
 import com.sofascore.tonib.firsttask.service.model.AppDatabase;
 import com.sofascore.tonib.firsttask.service.model.daos.PlayerDao;
-import com.sofascore.tonib.firsttask.service.model.daos.TeamDao;
 import com.sofascore.tonib.firsttask.service.model.entities.Player;
-import com.sofascore.tonib.firsttask.service.model.entities.Team;
-import com.sofascore.tonib.firsttask.view.adapter.FavoritesAdapter;
+import com.sofascore.tonib.firsttask.service.repo.ProjectRepository;
 import com.sofascore.tonib.firsttask.view.adapter.PlayersAdapter;
 
 import java.util.Collections;
@@ -27,13 +25,35 @@ import io.reactivex.schedulers.Schedulers;
 
 public class PlayersListViewModel extends AndroidViewModel {
 
+    private final static int PLAYERS_COUNTRY_CODE = 238;
     private PlayerDao playerDao;
+    private ProjectRepository repo;
     public CompositeDisposable compositeDisposable = new CompositeDisposable();
-    private MutableLiveData<List<Player>> players;
+    private MutableLiveData<List<Player>> apiPlayers;
+    private MutableLiveData<List<Player>> dbPlayers;
 
     public PlayersListViewModel(@NonNull Application application) {
         super(application);
         playerDao = AppDatabase.getInstance(application).playerDao();
+        repo = new ProjectRepository();
+    }
+
+    public void fetchPlayersFromAPI(final SwipeRefreshLayout swipeRefreshLayout) {
+        Disposable disposable = repo.getAllPlayers(PLAYERS_COUNTRY_CODE)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(players -> {
+                    Collections.sort(players, (p1, p2) -> p1.getPlayerName().compareToIgnoreCase(p2.getPlayerName()));
+                    return players;
+                })
+                .subscribe(players -> {
+                        if (swipeRefreshLayout != null) {
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        apiPlayers.postValue(players);
+                    }
+                );
+        compositeDisposable.add(disposable);
     }
 
     public void fetchPlayersFromDB(final SwipeRefreshLayout swipeRefreshLayout) {
@@ -48,16 +68,37 @@ public class PlayersListViewModel extends AndroidViewModel {
                     if (swipeRefreshLayout != null) {
                         swipeRefreshLayout.setRefreshing(false);
                     }
-                    this.players.postValue(players);
+                    this.dbPlayers.postValue(players);
                 });
         compositeDisposable.add(disposable);
+    }
+
+    @SuppressLint("CheckResult")
+    public void insertPlayer(final Player player, PlayersAdapter playersAdapter) {
+        Completable.fromAction(() -> playerDao.insertPlayer(player))
+                .subscribeWith(new DisposableCompletableObserver() {
+
+                    @Override
+                    public void onStart() {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // report Error
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        fetchPlayersFromDB(null);
+                    }
+                });
     }
 
     @SuppressLint("CheckResult")
     public void deletePlayer(final int playerId, PlayersAdapter playersAdapter) {
         Completable.fromAction(()->playerDao.deletePlayer(playerId))
                 .subscribeWith(new DisposableCompletableObserver() {
-
 
                     @Override
                     public void onStart() {
@@ -76,10 +117,17 @@ public class PlayersListViewModel extends AndroidViewModel {
                 });
     }
 
-    public MutableLiveData<List<Player>> getPlayers() {
-        if (players == null) {
-            players = new MutableLiveData<>();
+    public MutableLiveData<List<Player>> getApiPlayers() {
+        if (apiPlayers == null) {
+            apiPlayers = new MutableLiveData<>();
         }
-        return players;
+        return apiPlayers;
+    }
+
+    public MutableLiveData<List<Player>> getDbPlayers() {
+        if (dbPlayers == null) {
+            dbPlayers = new MutableLiveData<>();
+        }
+        return dbPlayers;
     }
 }

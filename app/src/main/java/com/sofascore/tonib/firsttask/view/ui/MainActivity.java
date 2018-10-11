@@ -39,6 +39,10 @@ public class MainActivity extends AppCompatActivity {
                         teamFragment.getDataFromDb();
                         break;
                     case 1:
+                        PlayerFragment playerFragment = (PlayerFragment) adapterViewPager.getItem(i);
+                        playerFragment.getDataFromDb();
+                        break;
+                    case 2:
                         FavoritesFragment favoritesFragment = (FavoritesFragment) adapterViewPager.getItem(i);
                         favoritesFragment.getData();
                         break;
