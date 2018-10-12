@@ -10,13 +10,13 @@ import com.sofascore.tonib.firsttask.service.model.entities.Manager;
 
 import java.util.List;
 
-import io.reactivex.Single;
+import io.reactivex.Flowable;
 
 @Dao
 public interface ManagerDao {
 
     @Query("SELECT * FROM manager")
-    Single<List<Manager>> getAllManagers();
+    Flowable<List<Manager>> getAllManagers();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertManager(Manager manager);

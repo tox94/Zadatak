@@ -29,7 +29,7 @@ public class PlayersListViewModel extends AndroidViewModel {
 
     private PlayerDao playerDao;
     private ProjectRepository repo;
-    public CompositeDisposable compositeDisposable = new CompositeDisposable();
+    public CompositeDisposable playersCompositeDisposable = new CompositeDisposable();
     private MutableLiveData<List<Player>> apiPlayers;
     private MutableLiveData<List<Player>> dbPlayers;
 
@@ -53,7 +53,7 @@ public class PlayersListViewModel extends AndroidViewModel {
                     fetchPlayersFromDB();
                 });
 
-        compositeDisposable.add(disposable);
+        playersCompositeDisposable.add(disposable);
     }
 
     public void fetchPlayersFromDB() {
@@ -68,7 +68,7 @@ public class PlayersListViewModel extends AndroidViewModel {
                 .subscribe(players -> {
                     this.dbPlayers.postValue(players);
                 });
-        compositeDisposable.add(disposable);
+        playersCompositeDisposable.add(disposable);
     }
 
     @SuppressLint("CheckResult")
@@ -128,4 +128,11 @@ public class PlayersListViewModel extends AndroidViewModel {
         }
         return dbPlayers;
     }
+
+    @Override
+    public void onCleared(){
+        super.onCleared();
+        playersCompositeDisposable.dispose();
+    }
+
 }

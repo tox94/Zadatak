@@ -10,13 +10,13 @@ import com.sofascore.tonib.firsttask.service.model.entities.Sport;
 
 import java.util.List;
 
-import io.reactivex.Single;
+import io.reactivex.Flowable;
 
 @Dao
 public interface SportDao {
 
     @Query("SELECT * FROM sport")
-    Single<List<Sport>> getAllSports();
+    Flowable<List<Sport>> getAllSports();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertSport(Sport sport);

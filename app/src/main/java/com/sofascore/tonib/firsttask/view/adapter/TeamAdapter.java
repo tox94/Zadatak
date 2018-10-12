@@ -83,7 +83,7 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
                     teamListViewModel.insertTeam(team);
                 } else {
                     Log.d("CHECKBOXCLICK", "Brisi " + team.getTeamName());
-                    teamListViewModel.deleteTeam(team.getTeamId());
+                    teamListViewModel.deleteTeam(team);
                 }
             });
         }

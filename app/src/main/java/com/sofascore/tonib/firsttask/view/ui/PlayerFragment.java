@@ -99,15 +99,15 @@ public class PlayerFragment extends Fragment {
     }
 
     private void restartCompositeDisposable(){
-        playersListViewModel.compositeDisposable.dispose();
-        playersListViewModel.compositeDisposable = new CompositeDisposable();
+        playersListViewModel.playersCompositeDisposable.dispose();
+        playersListViewModel.playersCompositeDisposable = new CompositeDisposable();
         checkForInternetConnection();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        playersListViewModel.compositeDisposable.dispose();
+        playersListViewModel.playersCompositeDisposable.dispose();
     }
 
     @Override
@@ -120,6 +120,6 @@ public class PlayerFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        playersListViewModel.compositeDisposable.dispose();
+        playersListViewModel.playersCompositeDisposable.dispose();
     }
 }

@@ -7,6 +7,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
 import com.sofascore.tonib.firsttask.service.model.AppDatabase;
+import com.sofascore.tonib.firsttask.service.model.daos.ManagerDao;
 import com.sofascore.tonib.firsttask.service.model.daos.SportDao;
 import com.sofascore.tonib.firsttask.service.model.daos.TeamDao;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
@@ -31,9 +32,11 @@ import io.reactivex.schedulers.Schedulers;
 public class TeamListViewModel extends AndroidViewModel {
 
     private static final int DELAY_TIME = 15;
+    private static final int NUMBER_OF_TEAMS = 50;
 
     private SportDao sportDao;
     private TeamDao teamDao;
+    private ManagerDao managerDao;
     private ProjectRepository repo;
     public CompositeDisposable teamsCompositeDisposable = new CompositeDisposable();
     private MutableLiveData<List<Team>> apiTeams;
@@ -43,6 +46,7 @@ public class TeamListViewModel extends AndroidViewModel {
         super(application);
         sportDao = AppDatabase.getInstance(application).sportDao();
         teamDao = AppDatabase.getInstance(application).teamDao();
+        managerDao = AppDatabase.getInstance(application).managerDao();
         repo = new ProjectRepository();
     }
 
@@ -58,7 +62,7 @@ public class TeamListViewModel extends AndroidViewModel {
                     return list;
                 })
                 .flatMap(Flowable::fromIterable)
-                .take(20)
+                .take(NUMBER_OF_TEAMS)
                 .flatMap(team -> repo.getTeamDetails(team.getTeamId()))
                 .toSortedList((t1, t2) -> t1.getTeamName().compareToIgnoreCase(t2.getTeamName()))
                 .toFlowable()
@@ -82,9 +86,7 @@ public class TeamListViewModel extends AndroidViewModel {
                     return teams;
                 })
                 .repeatWhen(objectFlowable -> objectFlowable.delay(DELAY_TIME, TimeUnit.SECONDS))
-                .subscribe(teams -> {
-                    dbTeams.postValue(teams);
-                });
+                .subscribe(teams -> dbTeams.postValue(teams));
         teamsCompositeDisposable.add(disposable);
     }
 
@@ -96,6 +98,9 @@ public class TeamListViewModel extends AndroidViewModel {
                     @Override
                     public void onStart() {
                         sportDao.insertSport(team.getSport());
+                        if (team.getManager() != null){
+                            managerDao.insertManager(team.getManager());
+                        }
                     }
 
                     @Override
@@ -111,13 +116,15 @@ public class TeamListViewModel extends AndroidViewModel {
     }
 
     @SuppressLint("CheckResult")
-    public void deleteTeam(final int teamId) {
-        Completable.fromAction(() -> teamDao.deleteTeam(teamId))
+    public void deleteTeam(final Team team) {
+        Completable.fromAction(() -> teamDao.deleteTeam(team.getTeamId()))
                 .subscribeWith(new DisposableCompletableObserver() {
 
                     @Override
                     public void onStart() {
-                        // do nothing
+                        if (team.getManager() != null){
+                            managerDao.deleteManager(team.getManager());
+                        }
                     }
 
                     @Override
@@ -144,5 +151,11 @@ public class TeamListViewModel extends AndroidViewModel {
             dbTeams = new MutableLiveData<>();
         }
         return dbTeams;
+    }
+
+    @Override
+    public void onCleared(){
+        super.onCleared();
+        teamsCompositeDisposable.dispose();
     }
 }
