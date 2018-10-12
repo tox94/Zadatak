@@ -48,8 +48,10 @@ public class PlayersListViewModel extends AndroidViewModel {
                     return players;
                 })
                 .repeatWhen(objectFlowable -> objectFlowable.delay(DELAY_TIME, TimeUnit.SECONDS))
-                .subscribe(players -> apiPlayers.postValue(players)
-                );
+                .subscribe(players -> {
+                    apiPlayers.postValue(players);
+                    fetchPlayersFromDB();
+                });
 
         compositeDisposable.add(disposable);
     }

@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.service.model.entities.Player;
+import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.viewmodel.PlayersListViewModel;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.List;
 
 public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayerViewHolder> {
     private List<Player> apiPlayers;
-    private HashMap<Integer, Player> dbPlayers;
+    private List<Player> dbPlayers;
     private PlayersListViewModel playersListViewModel;
 
 
@@ -32,13 +33,7 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayerVi
     }
 
     public void updateDbPlayers(List<Player> list) {
-        HashMap<Integer, Player> map = new HashMap<>();
-        if (list != null) {
-            for (Player p : list) {
-                map.put(p.getPlayerId(), p);
-            }
-        }
-        this.dbPlayers = map;
+        this.dbPlayers = list;
         notifyDataSetChanged();
     }
 
@@ -64,7 +59,7 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayerVi
         if (apiPlayers != null) {
             player = apiPlayers.get(position);
         } else {
-            player = dbPlayers.get(dbPlayers.keySet().toArray()[position]);
+            player = dbPlayers.get(position);
         }
         if (player != null) {
             TextView tv = viewHolder.detailsTextView;
@@ -72,7 +67,7 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayerVi
             tv.setText(player.getDetails());
             Boolean contains = false;
             if (dbPlayers != null) {
-                contains = dbPlayers.containsKey(player.getPlayerId());
+                contains = dbPlayers.contains(player);
             }
             if (contains) {
                 cb.setChecked(true);

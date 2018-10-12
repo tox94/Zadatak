@@ -87,7 +87,6 @@ public class TeamFragment extends Fragment {
         if (InternetUtils.isInternetAvailable(getActivity())) {
             Log.d("REFRESH_TEAM", "Postavljam");
             getDataFromApi();
-            getDataFromDb();
         } else {
             Toast.makeText(getActivity(), "Please turn on internet access.", Toast.LENGTH_SHORT).show();
         }

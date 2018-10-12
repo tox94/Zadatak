@@ -17,7 +17,7 @@ import java.util.List;
 
 public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder> {
     private List<Team> apiTeams;
-    private HashMap<Integer, Team> dbTeams;
+    private List<Team> dbTeams;
     private TeamListViewModel teamListViewModel;
 
 
@@ -32,13 +32,7 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
     }
 
     public void updateDbList(List<Team> list) {
-        HashMap<Integer, Team> map = new HashMap<>();
-        if (list != null) {
-            for (Team t : list) {
-                map.put(t.getTeamId(), t);
-            }
-        }
-        this.dbTeams = map;
+        this.dbTeams = list;
         notifyDataSetChanged();
     }
 
@@ -64,7 +58,7 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
         if (apiTeams != null) {
             team = apiTeams.get(position);
         } else {
-            team = dbTeams.get(dbTeams.keySet().toArray()[position]);
+            team = dbTeams.get(position);
         }
         if (team != null) {
             TextView tv = viewHolder.detailsTextView;
@@ -76,7 +70,7 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
             tv.setText(details);
             Boolean contains = false;
             if (dbTeams != null) {
-                contains = dbTeams.containsKey(team.getTeamId());
+                contains = dbTeams.contains(team);
             }
             if (contains) {
                 cb.setChecked(true);

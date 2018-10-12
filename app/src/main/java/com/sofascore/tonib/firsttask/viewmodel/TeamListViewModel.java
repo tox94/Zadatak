@@ -66,6 +66,7 @@ public class TeamListViewModel extends AndroidViewModel {
                 .repeatWhen(objectFlowable -> objectFlowable.delay(DELAY_TIME, TimeUnit.SECONDS))
                 .subscribe(teams -> {
                     apiTeams.postValue(teams);
+                    fetchTeamsFromDB();
                 }, throwable -> {
 
                 });

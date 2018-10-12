@@ -85,7 +85,6 @@ public class PlayerFragment extends Fragment {
     public void checkForInternetConnection() {
         if (InternetUtils.isInternetAvailable(getActivity())) {
             getDataFromApi();
-            getDataFromDb();
         } else {
             Toast.makeText(getActivity(), "Please turn on internet access.", Toast.LENGTH_SHORT).show();
         }
