@@ -3,7 +3,6 @@ package com.sofascore.tonib.firsttask.view.ui;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -19,10 +18,7 @@ import android.widget.Toast;
 import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.service.InternetUtils;
 import com.sofascore.tonib.firsttask.service.model.entities.Player;
-import com.sofascore.tonib.firsttask.service.model.entities.Team;
-import com.sofascore.tonib.firsttask.view.adapter.FavoritesAdapter;
 import com.sofascore.tonib.firsttask.view.adapter.PlayersAdapter;
-import com.sofascore.tonib.firsttask.viewmodel.FavoritesListViewModel;
 import com.sofascore.tonib.firsttask.viewmodel.PlayersListViewModel;
 
 import java.util.List;
@@ -31,16 +27,10 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class PlayerFragment extends Fragment {
 
-    private static final int MY_PERIOD = 30000;
-
     private PlayersListViewModel playersListViewModel;
     private RecyclerView recyclerView;
     private PlayersAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
-
-    public static PlayerFragment newInstance() {
-        return new PlayerFragment();
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -56,7 +46,6 @@ public class PlayerFragment extends Fragment {
 
         initViews();
         initLiveData();
-
         checkForInternetConnection();
     }
 

@@ -16,10 +16,6 @@ public class EmptyFragment extends Fragment {
 
     private EmptyViewModel mViewModel;
 
-    public static EmptyFragment newInstance() {
-        return new EmptyFragment();
-    }
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {

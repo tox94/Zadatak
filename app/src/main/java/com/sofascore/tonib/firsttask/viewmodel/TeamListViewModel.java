@@ -12,8 +12,6 @@ import com.sofascore.tonib.firsttask.service.model.daos.TeamDao;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.service.repo.ProjectRepository;
 
-import org.reactivestreams.Publisher;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -26,21 +24,18 @@ import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import io.reactivex.functions.Function3;
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class TeamListViewModel extends AndroidViewModel {
 
-    private static final int[] COUNTRY_CODES = {218, 220, 238};
+    private static final int DELAY_TIME = 15;
 
     private SportDao sportDao;
     private TeamDao teamDao;
     private ProjectRepository repo;
     public CompositeDisposable teamsCompositeDisposable = new CompositeDisposable();
-    public Disposable apiDisposable;
-    public Disposable dbDisposable;
     private MutableLiveData<List<Team>> apiTeams;
     private MutableLiveData<List<Team>> dbTeams;
 
@@ -52,7 +47,7 @@ public class TeamListViewModel extends AndroidViewModel {
     }
 
     public void fetchTeamsFromAPI() {
-        apiDisposable = Flowable.zip(repo.getAllTeams(218), repo.getAllTeams(220),
+        Disposable disposable = Flowable.zip(repo.getAllTeams(218), repo.getAllTeams(220),
                 repo.getAllTeams(238), (Function3<List<Team>, List<Team>, List<Team>, List<Team>>) (teams, teams2, teams3) -> {
                     ArrayList<Team> list = new ArrayList<>();
                     Set<Team> set = new HashSet<>();
@@ -63,44 +58,33 @@ public class TeamListViewModel extends AndroidViewModel {
                     return list;
                 })
                 .flatMap(Flowable::fromIterable)
-                .take(5)
+                .take(20)
                 .flatMap(team -> repo.getTeamDetails(team.getTeamId()))
                 .toSortedList((t1, t2) -> t1.getTeamName().compareToIgnoreCase(t2.getTeamName()))
                 .toFlowable()
                 .observeOn(AndroidSchedulers.mainThread())
-                .repeatWhen(new Function<Flowable<Object>, Publisher<?>>() {
-                    @Override
-                    public Publisher<?> apply(Flowable<Object> objectFlowable) throws Exception {
-                        return objectFlowable.delay(10, TimeUnit.SECONDS);
-                    }
-                })
+                .repeatWhen(objectFlowable -> objectFlowable.delay(DELAY_TIME, TimeUnit.SECONDS))
                 .subscribe(teams -> {
                     apiTeams.postValue(teams);
                 }, throwable -> {
 
                 });
-        teamsCompositeDisposable.add(apiDisposable);
+        teamsCompositeDisposable.add(disposable);
     }
 
     public void fetchTeamsFromDB() {
-        dbDisposable = teamDao.getAllTeams()
-                .repeat()
+        Disposable disposable = teamDao.getAllTeams()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(teams -> {
                     Collections.sort(teams, (t1, t2) -> t1.getTeamName().compareToIgnoreCase(t2.getTeamName()));
                     return teams;
                 })
-                .repeatWhen(new Function<Flowable<Object>, Publisher<?>>() {
-                    @Override
-                    public Publisher<?> apply(Flowable<Object> objectFlowable) throws Exception {
-                        return objectFlowable.delay(10, TimeUnit.SECONDS);
-                    }
-                })
+                .repeatWhen(objectFlowable -> objectFlowable.delay(DELAY_TIME, TimeUnit.SECONDS))
                 .subscribe(teams -> {
                     dbTeams.postValue(teams);
                 });
-        teamsCompositeDisposable.add(dbDisposable);
+        teamsCompositeDisposable.add(disposable);
     }
 
     @SuppressLint("CheckResult")

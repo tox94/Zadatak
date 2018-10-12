@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.TeamViewHolder> {
+public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayerViewHolder> {
     private List<Player> apiPlayers;
     private HashMap<Integer, Player> dbPlayers;
     private PlayersListViewModel playersListViewModel;
@@ -24,12 +24,10 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.TeamView
 
     public PlayersAdapter(PlayersListViewModel playersListViewModel) {
         this.playersListViewModel = playersListViewModel;
-        apiPlayers = new ArrayList<>();
-        dbPlayers = new HashMap<>();
     }
 
     public void updateApiPlayers(List<Player> list) {
-        this.apiPlayers = list;
+        apiPlayers = list;
         notifyDataSetChanged();
     }
 
@@ -44,11 +42,11 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.TeamView
         notifyDataSetChanged();
     }
 
-    public static class TeamViewHolder extends RecyclerView.ViewHolder {
+    public static class PlayerViewHolder extends RecyclerView.ViewHolder {
         private TextView detailsTextView;
         private CheckBox checkBox;
 
-        public TeamViewHolder(View v) {
+        public PlayerViewHolder(View v) {
             super(v);
             detailsTextView = v.findViewById(R.id.playerDetailsTextView);
             checkBox = v.findViewById(R.id.playerSaveCheckBox);
@@ -56,40 +54,49 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.TeamView
     }
 
     @Override
-    public TeamViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new TeamViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.player_list_item, parent, false));
+    public PlayerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new PlayerViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.player_list_item, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(TeamViewHolder viewHolder, int position) {
-        final Player player = apiPlayers.get(position);
-        TextView tv = viewHolder.detailsTextView;
-        CheckBox cb = viewHolder.checkBox;
-        tv.setText(player.getDetails());
-        Boolean contains = false;
-        if (dbPlayers != null) {
-            contains = dbPlayers.containsKey(player.getPlayerId());
-        }
-        if (contains) {
-            cb.setChecked(true);
+    public void onBindViewHolder(PlayerViewHolder viewHolder, int position) {
+        final Player player;
+        if (apiPlayers != null) {
+            player = apiPlayers.get(position);
         } else {
-            cb.setChecked(false);
+            player = dbPlayers.get(dbPlayers.keySet().toArray()[position]);
         }
-        cb.setOnClickListener(v -> {
-            if (((CheckBox) v).isChecked()) {
-                Log.d("CHECKBOXCLICK", "Dodaj " + player.getPlayerName());
-                playersListViewModel.insertPlayer(player);
-            } else {
-                Log.d("CHECKBOXCLICK", "Brisi " + player.getPlayerName());
-                playersListViewModel.deletePlayer(player.getPlayerId());
+        if (player != null) {
+            TextView tv = viewHolder.detailsTextView;
+            CheckBox cb = viewHolder.checkBox;
+            tv.setText(player.getDetails());
+            Boolean contains = false;
+            if (dbPlayers != null) {
+                contains = dbPlayers.containsKey(player.getPlayerId());
             }
-        });
+            if (contains) {
+                cb.setChecked(true);
+            } else {
+                cb.setChecked(false);
+            }
+            cb.setOnClickListener(v -> {
+                if (((CheckBox) v).isChecked()) {
+                    Log.d("CHECKBOXCLICK", "Dodaj " + player.getPlayerName());
+                    playersListViewModel.insertPlayer(player);
+                } else {
+                    Log.d("CHECKBOXCLICK", "Brisi " + player.getPlayerName());
+                    playersListViewModel.deletePlayer(player.getPlayerId());
+                }
+            });
+        }
     }
 
     @Override
     public int getItemCount() {
         if (apiPlayers != null) {
             return apiPlayers.size();
+        } else if (dbPlayers != null) {
+            return dbPlayers.size();
         } else {
             return 0;
         }

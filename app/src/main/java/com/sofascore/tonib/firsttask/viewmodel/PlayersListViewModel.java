@@ -5,31 +5,28 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
-import android.support.v4.widget.SwipeRefreshLayout;
 
 import com.sofascore.tonib.firsttask.service.model.AppDatabase;
 import com.sofascore.tonib.firsttask.service.model.daos.PlayerDao;
 import com.sofascore.tonib.firsttask.service.model.entities.Player;
 import com.sofascore.tonib.firsttask.service.repo.ProjectRepository;
 
-import org.reactivestreams.Publisher;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
-import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class PlayersListViewModel extends AndroidViewModel {
 
     private final static int PLAYERS_COUNTRY_CODE = 238;
+    private static final int DELAY_TIME = 15;
+
     private PlayerDao playerDao;
     private ProjectRepository repo;
     public CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -50,12 +47,7 @@ public class PlayersListViewModel extends AndroidViewModel {
                     Collections.sort(players, (p1, p2) -> p1.getPlayerName().compareToIgnoreCase(p2.getPlayerName()));
                     return players;
                 })
-                .repeatWhen(new Function<Flowable<Object>, Publisher<?>>() {
-                    @Override
-                    public Publisher<?> apply(Flowable<Object> objectFlowable) throws Exception {
-                        return objectFlowable.delay(10, TimeUnit.SECONDS);
-                    }
-                })
+                .repeatWhen(objectFlowable -> objectFlowable.delay(DELAY_TIME, TimeUnit.SECONDS))
                 .subscribe(players -> apiPlayers.postValue(players)
                 );
 
@@ -70,12 +62,7 @@ public class PlayersListViewModel extends AndroidViewModel {
                     Collections.sort(players, (p1, p2) -> p1.getPlayerName().compareToIgnoreCase(p2.getPlayerName()));
                     return players;
                 })
-                .repeatWhen(new Function<Flowable<Object>, Publisher<?>>() {
-                    @Override
-                    public Publisher<?> apply(Flowable<Object> objectFlowable) throws Exception {
-                        return objectFlowable.delay(10, TimeUnit.SECONDS);
-                    }
-                })
+                .repeatWhen(objectFlowable -> objectFlowable.delay(DELAY_TIME, TimeUnit.SECONDS))
                 .subscribe(players -> {
                     this.dbPlayers.postValue(players);
                 });

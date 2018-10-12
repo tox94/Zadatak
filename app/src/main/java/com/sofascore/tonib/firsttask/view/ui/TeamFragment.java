@@ -32,10 +32,6 @@ public class TeamFragment extends Fragment {
     private TeamAdapter teamAdapter;
     private SwipeRefreshLayout teamSwipeRefreshLayout;
 
-    public static TeamFragment newInstance() {
-        return new TeamFragment();
-    }
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -50,7 +46,6 @@ public class TeamFragment extends Fragment {
 
         initViews();
         initLiveData();
-
         checkForInternetConnection();
     }
 
@@ -90,6 +85,7 @@ public class TeamFragment extends Fragment {
 
     public void checkForInternetConnection() {
         if (InternetUtils.isInternetAvailable(getActivity())) {
+            Log.d("REFRESH_TEAM", "Postavljam");
             getDataFromApi();
             getDataFromDb();
         } else {

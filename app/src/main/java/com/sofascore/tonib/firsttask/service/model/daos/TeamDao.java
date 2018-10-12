@@ -9,13 +9,14 @@ import com.sofascore.tonib.firsttask.service.model.entities.Team;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 
 @Dao
 public interface TeamDao {
 
     @Query("SELECT * FROM team")
-    Single<List<Team>> getAllTeams();
+    Flowable<List<Team>> getAllTeams();
 
     @Query("SELECT * FROM team WHERE id LIKE :id")
     Single<Team> getTeamById(int id);

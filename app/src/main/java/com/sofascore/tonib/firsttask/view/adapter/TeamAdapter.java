@@ -60,38 +60,47 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
 
     @Override
     public void onBindViewHolder(TeamViewHolder viewHolder, int position) {
-        final Team team = apiTeams.get(position);
-        TextView tv = viewHolder.detailsTextView;
-        CheckBox cb = viewHolder.checkBox;
-        String details = team.getTeamName();
-        /*if (team.getManager() != null) {
-            details += " - " + team.getManager().getManagerName();
-        }*/
-        tv.setText(details);
-        Boolean contains = false;
-        if (dbTeams != null) {
-            contains = dbTeams.containsKey(team.getTeamId());
-        }
-        if (contains) {
-            cb.setChecked(true);
+        final Team team;
+        if (apiTeams != null) {
+            team = apiTeams.get(position);
         } else {
-            cb.setChecked(false);
+            team = dbTeams.get(dbTeams.keySet().toArray()[position]);
         }
-        cb.setOnClickListener(v -> {
-            if (((CheckBox) v).isChecked()) {
-                Log.d("CHECKBOXCLICK", "Dodaj " + team.getTeamName());
-                teamListViewModel.insertTeam(team);
-            } else {
-                Log.d("CHECKBOXCLICK", "Brisi " + team.getTeamName());
-                teamListViewModel.deleteTeam(team.getTeamId());
+        if (team != null) {
+            TextView tv = viewHolder.detailsTextView;
+            CheckBox cb = viewHolder.checkBox;
+            String details = team.getTeamName();
+            if (team.getManager() != null) {
+                details += " - " + team.getManager().getManagerName();
             }
-        });
+            tv.setText(details);
+            Boolean contains = false;
+            if (dbTeams != null) {
+                contains = dbTeams.containsKey(team.getTeamId());
+            }
+            if (contains) {
+                cb.setChecked(true);
+            } else {
+                cb.setChecked(false);
+            }
+            cb.setOnClickListener(v -> {
+                if (((CheckBox) v).isChecked()) {
+                    Log.d("CHECKBOXCLICK", "Dodaj " + team.getTeamName());
+                    teamListViewModel.insertTeam(team);
+                } else {
+                    Log.d("CHECKBOXCLICK", "Brisi " + team.getTeamName());
+                    teamListViewModel.deleteTeam(team.getTeamId());
+                }
+            });
+        }
     }
 
     @Override
     public int getItemCount() {
         if (apiTeams != null) {
             return apiTeams.size();
+        } else if (dbTeams != null){
+            return dbTeams.size();
         } else {
             return 0;
         }
