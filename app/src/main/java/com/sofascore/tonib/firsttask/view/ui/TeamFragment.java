@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.Toast;
 
 import com.sofascore.tonib.firsttask.R;
@@ -24,6 +25,9 @@ import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 import java.util.List;
 
 import io.reactivex.disposables.CompositeDisposable;
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+
+import static com.sofascore.tonib.firsttask.view.ui.MainActivity.ANIMATION_DURATION;
 
 public class TeamFragment extends Fragment {
 
@@ -54,7 +58,11 @@ public class TeamFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         teamRecyclerView.setLayoutManager(layoutManager);
         teamRecyclerView.setHasFixedSize(true);
-        teamRecyclerView.setAdapter(teamAdapter);
+        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(teamAdapter);
+        scaleAdapter.setDuration(ANIMATION_DURATION);
+        scaleAdapter.setInterpolator(new OvershootInterpolator());
+        scaleAdapter.setFirstOnly(false);
+        teamRecyclerView.setAdapter(scaleAdapter);
 
         teamSwipeRefreshLayout = getActivity().findViewById(R.id.teamSwipeRefreshLayout);
         teamSwipeRefreshLayout.setOnRefreshListener(() -> {
@@ -100,7 +108,7 @@ public class TeamFragment extends Fragment {
         teamListViewModel.fetchTeamsFromDB();
     }
 
-    private void restartCompositeDisposable(){
+    private void restartCompositeDisposable() {
         teamListViewModel.teamsCompositeDisposable.dispose();
         teamListViewModel.teamsCompositeDisposable = new CompositeDisposable();
         checkForInternetConnection();

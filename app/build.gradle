@@ -46,6 +46,8 @@ dependencies {
     implementation 'android.arch.lifecycle:reactivestreams:1.1.1'
 
     implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'jp.wasabeef:recyclerview-animators:2.3.0'
+
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'

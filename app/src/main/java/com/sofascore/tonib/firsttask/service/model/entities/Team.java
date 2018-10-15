@@ -86,7 +86,7 @@ public class Team {
         return national;
     }
 
-    public String getDetails(){
+    public String getDetails() {
         return teamName + " - " + getSport().getName();
     }
 
@@ -114,7 +114,7 @@ public class Team {
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return teamName.hashCode() + teamId * teamSlug.hashCode() + sport.hashCode();
     }
 }

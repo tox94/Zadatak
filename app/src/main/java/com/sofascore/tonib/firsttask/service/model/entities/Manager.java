@@ -68,7 +68,7 @@ public class Manager {
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return managerId + managerName.hashCode() + managerSlug.hashCode();
     }
 }

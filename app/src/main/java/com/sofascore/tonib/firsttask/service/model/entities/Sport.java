@@ -50,7 +50,7 @@ public class Sport {
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return id + name.hashCode() + slug.hashCode();
     }
 }

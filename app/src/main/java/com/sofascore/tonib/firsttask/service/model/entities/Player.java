@@ -91,7 +91,7 @@ public class Player {
     @ColumnInfo(name = "contractUntilTimestamp")
     private String contractUntilTimestamp;
 
-    public String getDetails(){
+    public String getDetails() {
         return playerName;
     }
 
@@ -239,7 +239,7 @@ public class Player {
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return playerName.hashCode() + team.getTeamId() * playerSlug.hashCode() + team.hashCode();
     }
 }

@@ -26,4 +26,4 @@ public class ProjectRepository {
     public Flowable<Team> getTeamDetails(int teamId) {
         return teamsService.getTeamDetails(teamId);
     }
- }
+}

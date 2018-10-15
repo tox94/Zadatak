@@ -98,7 +98,7 @@ public class TeamListViewModel extends AndroidViewModel {
                     @Override
                     public void onStart() {
                         sportDao.insertSport(team.getSport());
-                        if (team.getManager() != null){
+                        if (team.getManager() != null) {
                             managerDao.insertManager(team.getManager());
                         }
                     }
@@ -122,7 +122,7 @@ public class TeamListViewModel extends AndroidViewModel {
 
                     @Override
                     public void onStart() {
-                        if (team.getManager() != null){
+                        if (team.getManager() != null) {
                             managerDao.deleteManager(team.getManager());
                         }
                     }
@@ -154,7 +154,7 @@ public class TeamListViewModel extends AndroidViewModel {
     }
 
     @Override
-    public void onCleared(){
+    public void onCleared() {
         super.onCleared();
         teamsCompositeDisposable.dispose();
     }

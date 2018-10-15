@@ -11,7 +11,6 @@ import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import java.util.List;
 
 import io.reactivex.Flowable;
-import io.reactivex.Single;
 
 @Dao
 public interface PlayerDao {

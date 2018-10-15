@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 
 import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.service.model.entities.Player;
@@ -21,6 +22,10 @@ import com.sofascore.tonib.firsttask.viewmodel.PlayersListViewModel;
 import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
 import java.util.List;
+
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+
+import static com.sofascore.tonib.firsttask.view.ui.MainActivity.ANIMATION_DURATION;
 
 public class FavoritesFragment extends Fragment {
 
@@ -55,13 +60,21 @@ public class FavoritesFragment extends Fragment {
         RecyclerView.LayoutManager teamsLayoutManager = new LinearLayoutManager(getActivity());
         favoriteTeamsRecyclerView.setLayoutManager(teamsLayoutManager);
         favoriteTeamsRecyclerView.setHasFixedSize(true);
-        favoriteTeamsRecyclerView.setAdapter(favoriteTeamsAdapter);
+        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(favoriteTeamsAdapter);
+        scaleAdapter.setDuration(ANIMATION_DURATION);
+        scaleAdapter.setInterpolator(new OvershootInterpolator());
+        scaleAdapter.setFirstOnly(false);
+        favoriteTeamsRecyclerView.setAdapter(scaleAdapter);
 
         favoritePlayersRecyclerView = getActivity().findViewById(R.id.favoritePlayersRecyclerView);
         RecyclerView.LayoutManager playersLayoutManager = new LinearLayoutManager(getActivity());
         favoritePlayersRecyclerView.setLayoutManager(playersLayoutManager);
         favoritePlayersRecyclerView.setHasFixedSize(true);
-        favoritePlayersRecyclerView.setAdapter(favoritePlayersAdapter);
+        ScaleInAnimationAdapter scaleAdapter2 = new ScaleInAnimationAdapter(favoritePlayersAdapter);
+        scaleAdapter2.setDuration(ANIMATION_DURATION);
+        scaleAdapter2.setInterpolator(new OvershootInterpolator());
+        scaleAdapter2.setFirstOnly(false);
+        favoritePlayersRecyclerView.setAdapter(scaleAdapter);
     }
 
     private void initLiveData() {
@@ -71,7 +84,7 @@ public class FavoritesFragment extends Fragment {
         favoritePlayersListViewModel.getDbPlayers().observe(this, favoritePlayersObserver);
     }
 
-    public void getData(){
+    public void getData() {
         favoriteTeamsListViewModel.fetchTeamsFromDB();
         favoritePlayersListViewModel.fetchPlayersFromDB();
     }

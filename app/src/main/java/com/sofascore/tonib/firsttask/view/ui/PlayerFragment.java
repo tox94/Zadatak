@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.Toast;
 
 import com.sofascore.tonib.firsttask.R;
@@ -24,6 +25,9 @@ import com.sofascore.tonib.firsttask.viewmodel.PlayersListViewModel;
 import java.util.List;
 
 import io.reactivex.disposables.CompositeDisposable;
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+
+import static com.sofascore.tonib.firsttask.view.ui.MainActivity.ANIMATION_DURATION;
 
 public class PlayerFragment extends Fragment {
 
@@ -54,7 +58,11 @@ public class PlayerFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(adapter);
+        ScaleInAnimationAdapter scaleAdapter = new ScaleInAnimationAdapter(adapter);
+        scaleAdapter.setDuration(ANIMATION_DURATION);
+        scaleAdapter.setInterpolator(new OvershootInterpolator());
+        scaleAdapter.setFirstOnly(false);
+        recyclerView.setAdapter(scaleAdapter);
 
         swipeRefreshLayout = getActivity().findViewById(R.id.playerSwipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(() -> {
@@ -66,13 +74,13 @@ public class PlayerFragment extends Fragment {
 
     private void initLiveData() {
         final Observer<List<Player>> apiPlayersObserver = players -> {
-            if(swipeRefreshLayout.isRefreshing()){
+            if (swipeRefreshLayout.isRefreshing()) {
                 swipeRefreshLayout.setRefreshing(false);
             }
             adapter.updateApiPlayers(players);
         };
         final Observer<List<Player>> dbPlayersObserver = players -> {
-            if(swipeRefreshLayout.isRefreshing()){
+            if (swipeRefreshLayout.isRefreshing()) {
                 swipeRefreshLayout.setRefreshing(false);
             }
             adapter.updateDbPlayers(players);
@@ -98,7 +106,7 @@ public class PlayerFragment extends Fragment {
         playersListViewModel.fetchPlayersFromDB();
     }
 
-    private void restartCompositeDisposable(){
+    private void restartCompositeDisposable() {
         playersListViewModel.playersCompositeDisposable.dispose();
         playersListViewModel.playersCompositeDisposable = new CompositeDisposable();
         checkForInternetConnection();

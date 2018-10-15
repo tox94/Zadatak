@@ -12,7 +12,7 @@
         android:orientation="vertical"
         android:layout_weight="1">
 
-        <View style="@style/Divider"/>
+        <View style="@style/Divider" />
 
         <TextView
             android:id="@+id/favoriteTeamsTextView"
@@ -22,19 +22,19 @@
             android:gravity="center"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="@color/colorPrimary"/>
+            android:textColor="@color/colorPrimary" />
 
-        <View style="@style/Divider"/>
+        <View style="@style/Divider" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/favoriteTeamsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="vertical"/>
+            android:scrollbars="vertical" />
 
     </LinearLayout>
 
-    <View style="@style/Divider"/>
+    <View style="@style/Divider" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -50,15 +50,15 @@
             android:gravity="center"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="@color/colorPrimary"/>
+            android:textColor="@color/colorPrimary" />
 
-        <View style="@style/Divider"/>
+        <View style="@style/Divider" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/favoritePlayersRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="vertical"/>
+            android:scrollbars="vertical" />
 
     </LinearLayout>
 

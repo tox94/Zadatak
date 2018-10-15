@@ -1,19 +1,15 @@
 package com.sofascore.tonib.firsttask.view.viewpager;
 
-import android.arch.persistence.room.Embedded;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.util.Log;
-import android.view.ViewGroup;
 
 import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.view.ui.EmptyFragment;
 import com.sofascore.tonib.firsttask.view.ui.FavoritesFragment;
 import com.sofascore.tonib.firsttask.view.ui.PlayerFragment;
 import com.sofascore.tonib.firsttask.view.ui.TeamFragment;
-import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
 public class CustomViewPagerAdapter extends FragmentPagerAdapter {
 

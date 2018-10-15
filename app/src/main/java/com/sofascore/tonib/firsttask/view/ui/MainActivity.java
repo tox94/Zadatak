@@ -11,6 +11,8 @@ import com.sofascore.tonib.firsttask.view.viewpager.CustomViewPagerAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final int ANIMATION_DURATION = 500;
+
     private ViewPager vp;
     private FragmentPagerAdapter adapterViewPager;
 
@@ -30,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int i) {
-                switch(i){
+                switch (i) {
                     case 0:
                         TeamFragment teamFragment = (TeamFragment) adapterViewPager.getItem(0);
                         teamFragment.getDataFromDb();
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
             }
+
             @Override
             public void onPageScrollStateChanged(int i) {
             }

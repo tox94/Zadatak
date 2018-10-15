@@ -95,7 +95,7 @@ public class PlayersListViewModel extends AndroidViewModel {
 
     @SuppressLint("CheckResult")
     public void deletePlayer(final int playerId) {
-        Completable.fromAction(()->playerDao.deletePlayer(playerId))
+        Completable.fromAction(() -> playerDao.deletePlayer(playerId))
                 .subscribeWith(new DisposableCompletableObserver() {
 
                     @Override
@@ -109,7 +109,7 @@ public class PlayersListViewModel extends AndroidViewModel {
                     }
 
                     @Override
-                    public void onComplete(){
+                    public void onComplete() {
                         fetchPlayersFromDB();
                     }
                 });
@@ -130,7 +130,7 @@ public class PlayersListViewModel extends AndroidViewModel {
     }
 
     @Override
-    public void onCleared(){
+    public void onCleared() {
         super.onCleared();
         playersCompositeDisposable.dispose();
     }

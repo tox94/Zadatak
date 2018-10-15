@@ -12,7 +12,6 @@ import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder> {
@@ -93,7 +92,7 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
     public int getItemCount() {
         if (apiTeams != null) {
             return apiTeams.size();
-        } else if (dbTeams != null){
+        } else if (dbTeams != null) {
             return dbTeams.size();
         } else {
             return 0;
