@@ -11,7 +11,7 @@ import com.sofascore.tonib.firsttask.view.viewpager.CustomViewPagerAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int ANIMATION_DURATION = 500;
+    public static final int ANIMATION_DURATION = 300;
 
     private ViewPager vp;
     private FragmentPagerAdapter adapterViewPager;
@@ -53,6 +53,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
 }

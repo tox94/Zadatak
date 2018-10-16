@@ -74,14 +74,14 @@ public class FavoritesFragment extends Fragment {
         scaleAdapter2.setDuration(ANIMATION_DURATION);
         scaleAdapter2.setInterpolator(new OvershootInterpolator());
         scaleAdapter2.setFirstOnly(false);
-        favoritePlayersRecyclerView.setAdapter(scaleAdapter);
+        favoritePlayersRecyclerView.setAdapter(scaleAdapter2);
     }
 
     private void initLiveData() {
         final Observer<List<Team>> favoriteTeamsObserver = teams -> favoriteTeamsAdapter.updateDbList(teams);
         final Observer<List<Player>> favoritePlayersObserver = players -> favoritePlayersAdapter.updateDbPlayers(players);
-        favoriteTeamsListViewModel.getDbTeams().observe(this, favoriteTeamsObserver);
-        favoritePlayersListViewModel.getDbPlayers().observe(this, favoritePlayersObserver);
+        favoriteTeamsListViewModel.getTeamsFromDB().observe(this, favoriteTeamsObserver);
+        favoritePlayersListViewModel.getPlayersFromDB().observe(this, favoritePlayersObserver);
     }
 
     public void getData() {

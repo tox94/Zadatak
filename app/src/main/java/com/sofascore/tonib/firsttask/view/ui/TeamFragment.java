@@ -1,5 +1,6 @@
 package com.sofascore.tonib.firsttask.view.ui;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
@@ -24,7 +25,6 @@ import com.sofascore.tonib.firsttask.viewmodel.TeamListViewModel;
 
 import java.util.List;
 
-import io.reactivex.disposables.CompositeDisposable;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
 import static com.sofascore.tonib.firsttask.view.ui.MainActivity.ANIMATION_DURATION;
@@ -68,7 +68,7 @@ public class TeamFragment extends Fragment {
         teamSwipeRefreshLayout.setOnRefreshListener(() -> {
             Log.d("REFRESH_TEAM", "Tu sam");
             teamSwipeRefreshLayout.setRefreshing(true);
-            restartCompositeDisposable();
+            //initLiveData();
         });
     }
 
@@ -77,6 +77,7 @@ public class TeamFragment extends Fragment {
             if (teamSwipeRefreshLayout.isRefreshing()) {
                 teamSwipeRefreshLayout.setRefreshing(false);
             }
+            Log.d("UPDATEANI_TIMOVI", "Sad");
             teamAdapter.updateApiList(teams);
         };
 
@@ -87,8 +88,8 @@ public class TeamFragment extends Fragment {
             teamAdapter.updateDbList(teams);
         };
 
-        teamListViewModel.getApiTeams().observe(this, apiTeamObserver);
-        teamListViewModel.getDbTeams().observe(this, dbTeamObserver);
+        getDataFromApi().observe(this, apiTeamObserver);
+        getDataFromDb().observe(this, dbTeamObserver);
     }
 
     public void checkForInternetConnection() {
@@ -100,35 +101,11 @@ public class TeamFragment extends Fragment {
         }
     }
 
-    private void getDataFromApi() {
-        teamListViewModel.fetchTeamsFromAPI();
+    private LiveData<List<Team>> getDataFromApi() {
+        return teamListViewModel.getTeamsFromAPI();
     }
 
-    public void getDataFromDb() {
-        teamListViewModel.fetchTeamsFromDB();
-    }
-
-    private void restartCompositeDisposable() {
-        teamListViewModel.teamsCompositeDisposable.dispose();
-        teamListViewModel.teamsCompositeDisposable = new CompositeDisposable();
-        checkForInternetConnection();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        teamListViewModel.teamsCompositeDisposable.dispose();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        restartCompositeDisposable();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        teamListViewModel.teamsCompositeDisposable.dispose();
+    public LiveData<List<Team>> getDataFromDb() {
+        return teamListViewModel.getTeamsFromDB();
     }
 }

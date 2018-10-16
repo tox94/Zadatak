@@ -1,5 +1,7 @@
 package com.sofascore.tonib.firsttask.view.ui;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import android.widget.Toast;
 import com.sofascore.tonib.firsttask.R;
 import com.sofascore.tonib.firsttask.service.InternetUtils;
 import com.sofascore.tonib.firsttask.service.model.entities.Player;
+import com.sofascore.tonib.firsttask.service.model.entities.Team;
 import com.sofascore.tonib.firsttask.view.adapter.PlayersAdapter;
 import com.sofascore.tonib.firsttask.viewmodel.PlayersListViewModel;
 
@@ -35,6 +38,8 @@ public class PlayerFragment extends Fragment {
     private RecyclerView recyclerView;
     private PlayersAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private Observer<List<Player>> apiPlayersObserver;
+    private Observer<List<Player>> dbPlayersObserver;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -68,26 +73,26 @@ public class PlayerFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(() -> {
             Log.d("REFRESH_PLAYER", "Tu sam");
             swipeRefreshLayout.setRefreshing(true);
-            restartCompositeDisposable();
+            initLiveData();
         });
     }
 
     private void initLiveData() {
-        final Observer<List<Player>> apiPlayersObserver = players -> {
+        apiPlayersObserver = players -> {
             if (swipeRefreshLayout.isRefreshing()) {
                 swipeRefreshLayout.setRefreshing(false);
             }
+            Log.d("UPDATEANI_IGRACI", "Sad");
             adapter.updateApiPlayers(players);
         };
-        final Observer<List<Player>> dbPlayersObserver = players -> {
+        dbPlayersObserver = players -> {
             if (swipeRefreshLayout.isRefreshing()) {
                 swipeRefreshLayout.setRefreshing(false);
             }
             adapter.updateDbPlayers(players);
         };
-
-        playersListViewModel.getApiPlayers().observe(this, apiPlayersObserver);
-        playersListViewModel.getDbPlayers().observe(this, dbPlayersObserver);
+        getDataFromApi().observe(this, apiPlayersObserver);
+        getDataFromDb().observe(this, dbPlayersObserver);
     }
 
     public void checkForInternetConnection() {
@@ -98,36 +103,11 @@ public class PlayerFragment extends Fragment {
         }
     }
 
-    private void getDataFromApi() {
-        playersListViewModel.fetchPlayersFromAPI();
+    private LiveData<List<Player>> getDataFromApi() {
+        return playersListViewModel.getPlayersFromAPI();
     }
 
-    public void getDataFromDb() {
-        playersListViewModel.fetchPlayersFromDB();
-    }
-
-    private void restartCompositeDisposable() {
-        playersListViewModel.playersCompositeDisposable.dispose();
-        playersListViewModel.playersCompositeDisposable = new CompositeDisposable();
-        checkForInternetConnection();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        playersListViewModel.playersCompositeDisposable.dispose();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        swipeRefreshLayout.setRefreshing(true);
-        restartCompositeDisposable();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        playersListViewModel.playersCompositeDisposable.dispose();
+    public LiveData<List<Player>> getDataFromDb() {
+        return playersListViewModel.getPlayersFromDB();
     }
 }

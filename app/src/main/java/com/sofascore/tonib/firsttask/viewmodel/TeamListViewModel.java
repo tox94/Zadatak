@@ -3,6 +3,8 @@ package com.sofascore.tonib.firsttask.viewmodel;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.LiveDataReactiveStreams;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
@@ -23,8 +25,6 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function3;
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -38,9 +38,6 @@ public class TeamListViewModel extends AndroidViewModel {
     private TeamDao teamDao;
     private ManagerDao managerDao;
     private ProjectRepository repo;
-    public CompositeDisposable teamsCompositeDisposable = new CompositeDisposable();
-    private MutableLiveData<List<Team>> apiTeams;
-    private MutableLiveData<List<Team>> dbTeams;
 
     public TeamListViewModel(@NonNull Application application) {
         super(application);
@@ -50,8 +47,8 @@ public class TeamListViewModel extends AndroidViewModel {
         repo = new ProjectRepository();
     }
 
-    public void fetchTeamsFromAPI() {
-        Disposable disposable = Flowable.zip(repo.getAllTeams(218), repo.getAllTeams(220),
+    public Flowable<List<Team>> fetchTeamsFromAPI() {
+        return Flowable.zip(repo.getAllTeams(218), repo.getAllTeams(220),
                 repo.getAllTeams(238), (Function3<List<Team>, List<Team>, List<Team>, List<Team>>) (teams, teams2, teams3) -> {
                     ArrayList<Team> list = new ArrayList<>();
                     Set<Team> set = new HashSet<>();
@@ -67,27 +64,26 @@ public class TeamListViewModel extends AndroidViewModel {
                 .toSortedList((t1, t2) -> t1.getTeamName().compareToIgnoreCase(t2.getTeamName()))
                 .toFlowable()
                 .observeOn(AndroidSchedulers.mainThread())
-                .repeatWhen(objectFlowable -> objectFlowable.delay(DELAY_TIME, TimeUnit.SECONDS))
-                .subscribe(teams -> {
-                    apiTeams.postValue(teams);
-                    fetchTeamsFromDB();
-                }, throwable -> {
-
-                });
-        teamsCompositeDisposable.add(disposable);
+                .repeatWhen(objectFlowable -> objectFlowable.delay(DELAY_TIME, TimeUnit.SECONDS));
     }
 
-    public void fetchTeamsFromDB() {
-        Disposable disposable = teamDao.getAllTeams()
+    public LiveData<List<Team>> getTeamsFromAPI() {
+        return LiveDataReactiveStreams.fromPublisher(fetchTeamsFromAPI());
+    }
+
+    public Flowable<List<Team>> fetchTeamsFromDB() {
+        return teamDao.getAllTeams()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(teams -> {
                     Collections.sort(teams, (t1, t2) -> t1.getTeamName().compareToIgnoreCase(t2.getTeamName()));
                     return teams;
                 })
-                .repeatWhen(objectFlowable -> objectFlowable.delay(DELAY_TIME, TimeUnit.SECONDS))
-                .subscribe(teams -> dbTeams.postValue(teams));
-        teamsCompositeDisposable.add(disposable);
+                .repeatWhen(objectFlowable -> objectFlowable.delay(DELAY_TIME, TimeUnit.SECONDS));
+    }
+
+    public LiveData<List<Team>> getTeamsFromDB() {
+        return LiveDataReactiveStreams.fromPublisher(fetchTeamsFromDB());
     }
 
     @SuppressLint("CheckResult")
@@ -137,25 +133,5 @@ public class TeamListViewModel extends AndroidViewModel {
                         fetchTeamsFromDB();
                     }
                 });
-    }
-
-    public MutableLiveData<List<Team>> getApiTeams() {
-        if (apiTeams == null) {
-            apiTeams = new MutableLiveData<>();
-        }
-        return apiTeams;
-    }
-
-    public MutableLiveData<List<Team>> getDbTeams() {
-        if (dbTeams == null) {
-            dbTeams = new MutableLiveData<>();
-        }
-        return dbTeams;
-    }
-
-    @Override
-    public void onCleared() {
-        super.onCleared();
-        teamsCompositeDisposable.dispose();
     }
 }
